@@ -1,0 +1,96 @@
+# CLAUDE.md
+
+Project context for the Canada–US tariff checker. Read `HANDOFF.md` for full background.
+
+## What this app does
+
+Answers "is my product tariffed under the Canada–US trade dispute, and at what rate" for people who don't know their HS code. Static React SPA, no backend, data committed as JSON.
+
+## Layout
+
+```
+ingest/       Scrapers. Output goes to src/data/. Run manually or via CI.
+scripts/      Verification gates. `npm run check` runs all three.
+src/data/     ca-measures.json, us-measures.json, ca-history.json
+              — generated, but committed.
+src/lib/      data.js (shaping, duty stacking, freshness), search.js, aliases.js
+src/          App code.
+prototype/    The original single-file prototype. Reference only, partial data.
+```
+
+## Rules
+
+**Never invent an HS code.** Not to fill a gap, not to make an example, not as a placeholder. If a code isn't in a verified source, it doesn't go in the data. Every code must be a real 8-digit line, reconcilable against Canada's Customs Tariff or the USITC HTS.
+
+**8-digit throughout.** Canada's tariff items and US HTSUS annex lines are both 8-digit. Do not mix in 6- or 10-digit codes without flagging the level.
+
+**Cross-country joins at HS-6 only.** National codes diverge below 6 digits. Any comparison between the two lists, or any join to trade-value data, aggregates to 6 first. This produces silent errors if ignored.
+
+**Fail loud on partial data.** Scrapers throw rather than write short files. The UI announces incomplete coverage rather than letting a null result read as "not tariffed."
+
+**Preserve the disclaimers.** Finance Canada's list has no official sanction and its descriptions are illustrative. The app is not customs advice. Both statements stay visible.
+
+## Domain facts that are easy to get wrong
+
+- Canada's counter-tariffs key on **CUSMA marking origin**, not where the parcel shipped from.
+- **CUSMA does not exempt goods from US Section 338.** Coverage is decided by whether the HTS line is in an annex.
+- Tariffs **stack** on top of the base MFN rate and other duties. They don't replace it.
+- Section 338 excludes energy, potash, and Section 232 goods, plus U.S. Note 51(c) and (d).
+- U.S. note 51(c) carve-outs are all Section 232 actions: steel/aluminum/copper, passenger vehicles and parts, wood products, medium- and heavy-duty vehicles and parts, semiconductors, patented pharmaceuticals. Excluded from 338 does not mean untariffed — it means a different measure applies.
+- 28 codes sit in both 51(b) and 51(d): covered, unless the article qualifies as civil aircraft under General Note 6.
+- Canada's earlier 25% counter-tariffs were lifted on **1 September 2025** (not 2026). The page's own section labels settle it: 1,814 items up to 31 August 2025, 313 from 1 September 2025.
+
+## Commands
+
+```bash
+npm install && npm run dev
+npm run check      # data + aliases + search ranking. Run before committing data.
+npm run build
+
+cd ingest && npm i
+node scrape-canada.mjs    # 648 current rows + 2,127 historical, throws under 600
+node scrape-us.mjs        # 554 codes, throws under 500. Downloads chapter 99 itself.
+```
+
+`scrape-us.mjs` takes an optional path to a local chapter 99 PDF; with no
+argument it downloads the current release from the USITC.
+
+## Where the data actually comes from
+
+**Canada.** One page, but *three* tables inside separate `<details>` blocks:
+the list in force, and two superseded tranches. They do not share a column
+layout — the current one has 4 columns and puts the tariff item in a `<th>`,
+the historical ones have 6 columns and use `<td>` throughout. Selecting `td`
+and indexing columns positionally silently drops most of the page and mixes
+expired rates into live ones. Sections are matched on their `<summary>` text
+and columns by header label.
+
+**United States.** Not the Federal Register (annexes are images) and not CBP's
+CSMS attachment. Section 338's code lists are enacted as **U.S. note 51 to
+subchapter III of chapter 99**, which the USITC publishes as a PDF with a text
+layer. 51(b)(1)–(3) are the covered codes, 51(c) the Section 232 carve-outs,
+51(d) the civil aircraft carve-out. Every code is then reconciled against the
+live HTS via the USITC REST API before publication.
+
+Note the API returns **10-digit statistical lines**; the 8-digit tariff line
+exists only as their prefix. Keying on an exact 8-digit `htsno` finds almost
+nothing.
+
+## Search
+
+The alias map in `src/lib/aliases.js` is the product, not the ranking
+algorithm. Two rules learned the hard way:
+
+- Alias keys match on **word boundaries** with an optional plural. Plain
+  substring matching means "tee" fires inside "s**tee**l".
+- The fuzzy fallback runs **only** when the query matched no alias key. If we
+  recognise the word, an empty result is the answer — "socks" really are on
+  neither list, and guessing turns that into socket wrenches.
+
+Keys that resolve to nothing are kept deliberately. They are what lets the
+empty state say "we understood you, and it is not listed" instead of the much
+weaker "no results".
+
+## Style
+
+Plain language over customs jargon in anything user-facing — the audience includes people who have never seen a tariff schedule. Keep jargon in tooltips and detail views, not in the primary result line.

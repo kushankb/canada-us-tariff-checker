@@ -1,0 +1,26 @@
+{
+  "name": "canada-us-tariff-checker",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Is my product tariffed under the Canada-US trade dispute, and at what rate?",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "ingest:canada": "cd ingest && node scrape-canada.mjs",
+    "ingest:us": "cd ingest && node scrape-us.mjs",
+    "check:aliases": "node scripts/check-aliases.mjs",
+    "check:search": "node scripts/search-smoke.mjs",
+    "check:data": "node scripts/check-data.mjs",
+    "check": "npm run check:data && npm run check:aliases && npm run check:search"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.2"
+  }
+}

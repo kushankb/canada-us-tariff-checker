@@ -1,0 +1,55 @@
+name: Refresh tariff data
+
+# The commit history this produces IS the change feed. A diff on
+# src/data/*.json is the record of what moved on or off a list, and when —
+# which no official portal publishes.
+on:
+  schedule:
+    - cron: "0 11 * * 1-5" # weekdays, 11:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: |
+          npm ci --no-audit --no-fund
+          cd ingest && npm ci --no-audit --no-fund
+
+      # Both scrapers throw rather than write a short file, so a failure here
+      # leaves the previous good data committed and untouched.
+      - name: Scrape Canada
+        run: node ingest/scrape-canada.mjs
+
+      - name: Scrape United States
+        run: node ingest/scrape-us.mjs
+
+      # The data gate is what stands between a malformed scrape and a page
+      # that states a wrong duty rate with total confidence.
+      - name: Verify data
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit any change
+        run: |
+          git config user.name "tariff-data-bot"
+          git config user.email "actions@github.com"
+          git add src/data
+          if git diff --staged --quiet; then
+            echo "No change in the published lists."
+            exit 0
+          fi
+          git commit -m "data: refresh tariff lists $(date -u +%Y-%m-%d)"
+          git push

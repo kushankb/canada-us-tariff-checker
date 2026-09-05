@@ -1,0 +1,14 @@
+{
+  "name": "tariff-checker-ingest",
+  "private": true,
+  "type": "module",
+  "description": "Scrapers that generate ../src/data/*.json. Run manually or from CI.",
+  "scripts": {
+    "canada": "node scrape-canada.mjs",
+    "us": "node scrape-us.mjs"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "pdfjs-dist": "^4.2.67"
+  }
+}

@@ -1,0 +1,131 @@
+/**
+ * Data layer.
+ *
+ * The two current lists are bundled: together they are ~490KB of JSON, which
+ * gzips small and means the first search never waits on a network round trip.
+ * The superseded Canadian tranches are ~856KB and are only needed to answer
+ * "it used to be on the list", so they load on demand.
+ */
+
+import ca from "../data/ca-measures.json";
+import us from "../data/us-measures.json";
+
+export const CA = ca;
+export const US = us;
+
+/* ---------- shaping ---------- */
+
+/* One row shape for both sides, so search and rendering stay simple. */
+export const CA_ITEMS = ca.measures.map((m) => ({
+  side: "ca",
+  code: m.code,
+  rate: m.rate,
+  sector: m.sector,
+  desc: m.desc,
+  heading: m.heading,
+  authority: "Canada counter-tariff",
+  effective: m.effective || ca.effective,
+}));
+
+export const US_ITEMS = us.section338.map((m) => ({
+  side: "us",
+  code: m.code,
+  rate: m.rate,
+  sector: m.sector,
+  desc: m.desc,
+  heading: m.heading,
+  qualifier: m.qualifier || null,
+  baseDuty: m.baseDuty,
+  authority: m.authority,
+  entryHeading: m.entryHeading,
+  aircraftCarveOut: !!m.aircraftCarveOut,
+  effective: m.effective,
+}));
+
+/* Section 232 and forced-labour measures have no code list. They are searched
+   alongside the coded rows but render differently: no code, and a note that
+   coverage is decided by the proclamation's own scope. */
+export const US_SCOPE_ITEMS = us.otherMeasures.map((m, i) => ({
+  side: "us",
+  id: `scope-${i}`,
+  scopeLevel: true,
+  rate: m.rate,
+  sector: m.sector,
+  desc: m.scope,
+  heading: m.scope,
+  authority: m.authority,
+  cusmaExempt: m.cusmaExempt,
+  effective: m.effective,
+}));
+
+export const US_ALL = [...US_ITEMS, ...US_SCOPE_ITEMS];
+
+/* Codes carved out of Section 338 for civil aircraft under U.S. note 51(d). */
+export const US_AIRCRAFT = new Map(
+  (us.aircraftExclusions || []).map((a) => [a.code, a])
+);
+
+/* ---------- duty stacking ---------- */
+
+/* Section 338's 50% is additional to the base MFN rate, not a replacement.
+   Where the base rate is a plain percentage the two can be added and shown as
+   one number. Where it is specific (3.3 cents per kilo) or compound, they
+   cannot, and the app must not pretend otherwise. */
+export function stackedDuty(item) {
+  if (!item.baseDuty) return null;
+  const base = item.baseDuty.trim();
+  if (/^free$/i.test(base)) {
+    return { kind: "free", total: `${item.rate}%`, base: "Free" };
+  }
+  const pct = base.match(/^(\d+(?:\.\d+)?)\s*%$/);
+  if (pct) {
+    const total = Math.round((Number(pct[1]) + item.rate) * 100) / 100;
+    return { kind: "percent", total: `${total}%`, base };
+  }
+  return { kind: "specific", total: `${item.rate}% + ${base}`, base };
+}
+
+/* Rate bands. 50% is the top band on both sides, so it gets the strongest
+   colour; 15% and 25% step down from it. */
+export const rateColor = (r) =>
+  r >= 50 ? "var(--r50)" : r >= 25 ? "var(--r25)" : "var(--r15)";
+
+/* ---------- freshness ---------- */
+
+const DAY = 86_400_000;
+
+export function freshness(now = Date.now()) {
+  const stamps = [ca.scrapedAt, us.scrapedAt].map((s) => new Date(s).getTime());
+  const oldest = Math.min(...stamps);
+  const ageDays = Math.floor((now - oldest) / DAY);
+  return {
+    checkedAt: new Date(oldest),
+    ageDays,
+    // Fail loud rather than serving stale tariff rates quietly.
+    stale: ageDays >= 14,
+  };
+}
+
+/* ---------- history (loaded on demand) ---------- */
+
+let historyPromise = null;
+
+export function loadHistory() {
+  if (!historyPromise) {
+    historyPromise = import("../data/ca-history.json").then((m) => m.default || m);
+  }
+  return historyPromise;
+}
+
+/* ---------- formatting ---------- */
+
+export const fmtDate = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso.length === 10 ? `${iso}T00:00:00Z` : iso);
+  return d.toLocaleDateString("en-CA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+};

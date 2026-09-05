@@ -1,0 +1,631 @@
+/* Canada–U.S. tariff checker.
+   Editorial rather than app-like: this is reference material people read and
+   act on, so it favours a reading measure, a serif-free text face with real
+   weight contrast, and paper tones over chrome. */
+
+:root {
+  --paper: #fbfaf8;
+  --card: #ffffff;
+  --ink: #1a2129;
+  --dim: #5c6672;
+  --faint: #8b939c;
+  --rule: #dedad2;
+  --rule-soft: #ece8e1;
+
+  --us: #1f5c8b;
+  --ca: #a32a2a;
+
+  --r15: #8a6a00;
+  --r25: #b4551a;
+  --r50: #a8291a;
+  --ok: #2c6a4a;
+
+  --shadow: 0 1px 2px rgba(26, 33, 41, 0.05);
+  --radius: 4px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Public Sans", system-ui, -apple-system, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.15rem 5rem;
+}
+
+h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.024em;
+  line-height: 1.14;
+}
+h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.sub {
+  color: var(--dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  border-bottom: 2px solid var(--ink);
+  padding: 1.4rem 0 0.9rem;
+  margin-bottom: 0.9rem;
+}
+.flagline {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.55rem;
+  flex-wrap: wrap;
+}
+.chip {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+.chip.us {
+  background: var(--us);
+}
+.chip.ca {
+  background: var(--ca);
+}
+.flagline span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Coverage sits in the header, not the footer: with a partial dataset a null
+   result reads as "not tariffed", and burying that is how people get hurt. */
+.coverage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  font-size: 0.76rem;
+  color: var(--dim);
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--rule-soft);
+}
+.coverage b {
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.coverage .full::before {
+  content: "●";
+  color: var(--ok);
+  margin-right: 0.3rem;
+  font-size: 0.7em;
+  vertical-align: 0.15em;
+}
+
+.stalebar {
+  background: #fff4e2;
+  border: 1px solid #e2b872;
+  border-left: 5px solid var(--r25);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.85rem;
+  margin: 0.9rem 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+/* ---------- tabs ---------- */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 1.2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab {
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.7rem;
+  color: var(--dim);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+.tab[data-on="1"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+.tab:hover {
+  color: var(--ink);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--us);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ---------- buttons ---------- */
+
+.dirbtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 5px solid var(--edge, var(--rule));
+  padding: 0.95rem 1rem;
+  margin-bottom: 0.6rem;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color 0.12s, transform 0.08s;
+}
+.dirbtn:hover {
+  border-color: var(--edge, var(--dim));
+}
+.dirbtn:active {
+  transform: translateY(1px);
+}
+.dirbtn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.dirbtn b {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.15rem;
+}
+.dirbtn em {
+  font-style: normal;
+  color: var(--dim);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  display: block;
+}
+
+.back {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dim);
+  cursor: pointer;
+  padding: 0.3rem 0;
+  margin-bottom: 0.5rem;
+}
+.back:hover {
+  color: var(--ink);
+}
+.back:focus-visible {
+  outline: 2px solid var(--us);
+  outline-offset: 2px;
+}
+
+.linkbtn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: inherit;
+  color: var(--us);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ---------- search + filters ---------- */
+
+.searchrow {
+  position: relative;
+}
+.field {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.8rem 2.4rem 0.8rem 0.9rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+}
+.field:focus {
+  outline: 3px solid rgba(31, 92, 139, 0.28);
+  outline-offset: 1px;
+}
+.field::placeholder {
+  color: #969da6;
+}
+.clearbtn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--faint);
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  border-radius: 3px;
+}
+.clearbtn:hover {
+  color: var(--ink);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0.3rem;
+  align-items: center;
+}
+.filters .lbl {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--faint);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-right: 0.15rem;
+}
+.pill {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--card);
+  color: var(--dim);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pill:hover {
+  border-color: var(--dim);
+}
+.pill[data-on="1"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.pill:focus-visible {
+  outline: 2px solid var(--us);
+  outline-offset: 2px;
+}
+
+.aliasnote {
+  font-size: 0.78rem;
+  color: var(--dim);
+  margin-top: 0.5rem;
+}
+.aliasnote b {
+  color: var(--ink);
+}
+
+.resultbar {
+  font-size: 0.78rem;
+  color: var(--dim);
+  margin: 0.7rem 0 0.1rem;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.4rem;
+}
+
+/* ---------- rows ---------- */
+
+.row {
+  border-bottom: 1px solid var(--rule-soft);
+  padding: 0.85rem 0;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  width: 100%;
+  background: none;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.row:hover {
+  background: rgba(31, 92, 139, 0.035);
+}
+.row:focus-visible {
+  outline: 2px solid var(--us);
+  outline-offset: -2px;
+}
+.rate {
+  flex: 0 0 4.1rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  padding-top: 0.05rem;
+}
+.rate small {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 0.1rem;
+}
+.rowbody {
+  flex: 1;
+  min-width: 0;
+}
+.rowbody p {
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+.metaline {
+  font-size: 0.75rem;
+  color: var(--dim);
+  margin-top: 0.28rem;
+  font-variant-numeric: tabular-nums;
+}
+.code {
+  font-weight: 700;
+  color: var(--ink);
+}
+.tag {
+  display: inline-block;
+  margin-top: 0.35rem;
+  margin-right: 0.3rem;
+  font-size: 0.71rem;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 0.05rem 0.35rem;
+  font-weight: 600;
+}
+.tag.warn {
+  color: var(--r25);
+}
+.tag.info {
+  color: var(--us);
+}
+
+/* ---------- detail ---------- */
+
+.detail {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 5px solid var(--edge, var(--ink));
+  border-radius: var(--radius);
+  padding: 1.1rem 1.15rem;
+  box-shadow: var(--shadow);
+}
+.detail dl {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 0.5rem 0.9rem;
+  font-size: 0.87rem;
+}
+.detail dt {
+  color: var(--dim);
+  font-weight: 600;
+}
+.detail dd {
+  font-variant-numeric: tabular-nums;
+}
+.bigrate {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stackbox {
+  margin-top: 0.9rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.86rem;
+}
+.stackbox div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--rule-soft);
+  font-variant-numeric: tabular-nums;
+}
+.stackbox div:last-child {
+  border-bottom: 0;
+  background: #f6f4f0;
+  font-weight: 700;
+}
+.stackbox .lbl {
+  color: var(--dim);
+  font-weight: 400;
+}
+.stackbox div:last-child .lbl {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ---------- stats + notes ---------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1.1rem 0;
+}
+.stat {
+  background: var(--card);
+  padding: 0.85rem 0.9rem;
+}
+.stat b {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.stat span {
+  font-size: 0.76rem;
+  color: var(--dim);
+  line-height: 1.35;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.note {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 5px solid var(--edge, var(--dim));
+  padding: 0.85rem 0.95rem;
+  border-radius: var(--radius);
+  margin: 1rem 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.note b {
+  font-weight: 700;
+}
+.note.quiet {
+  background: transparent;
+  box-shadow: none;
+}
+
+.empty {
+  padding: 1.6rem 0 0.5rem;
+  color: var(--dim);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.empty h3 {
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+}
+.empty ul {
+  margin: 0.6rem 0 0 1.1rem;
+}
+.empty li {
+  margin-bottom: 0.25rem;
+}
+
+.foot {
+  margin-top: 2.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.78rem;
+  color: var(--dim);
+  line-height: 1.6;
+}
+.foot p + p {
+  margin-top: 0.7rem;
+}
+a {
+  color: var(--us);
+}
+
+.morebtn {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.7rem;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  cursor: pointer;
+}
+.morebtn:hover {
+  border-color: var(--dim);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  z-index: 10;
+  background: var(--ink);
+  color: #fff;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 460px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+  .detail dl {
+    grid-template-columns: 1fr;
+    gap: 0.15rem 0;
+  }
+  .detail dt {
+    margin-top: 0.5rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
