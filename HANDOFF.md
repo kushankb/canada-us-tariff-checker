@@ -94,7 +94,7 @@ These are the ones that make the difference between a useful tool and a harmful 
 
 Decision taken: **8-digit throughout.**
 
-**Open item.** Sources disagreed on whether to screen Section 338 at 8 or 10 digits — one advisory said match at eight, another said screen at ten against all three annexes. The working assumption is that a covered 8-digit heading catches all its 10-digit children. Verify this against CBP guidance before it drives public output.
+**Resolved 5 September 2026: screen at 8 digits.** A covered 8-digit heading is treated as catching every 10-digit statistical suffix beneath it. This is the conservative direction — it can flag a line a 10-digit reading might exclude, but it will not miss a covered one. Recorded as `screeningLevel: 8` in `us-measures.json` and stated in the UI, which also notes that entries file at 10 digits.
 
 **Cross-country joins are only valid at HS-6.** Canada's and the US's 8- and 10-digit codes are nationally assigned and diverge. Any comparison between the two lists, and any join to trade values, must aggregate to 6 digits first. Getting this wrong produces silent, plausible-looking errors.
 
@@ -243,3 +243,76 @@ fallback was scored alongside real term hits, so "sweater" returned milk powder
 ahead of pullovers and "socks" returned socket wrenches. Keys now match on word
 boundaries with an optional plural, and fuzzy matching runs only when the query
 hit no alias key at all.
+
+
+---
+
+## 11. Second pass, 5 September 2026 — the three open items
+
+### 1. Screening level: settled at 8 digits
+
+Decided, not discovered. A covered 8-digit heading catches every 10-digit
+suffix under it. It is the conservative direction: over-flagging is a
+recoverable error for a user, under-flagging is not. Recorded as
+`screeningLevel: 8` in the generated data, stated in the UI footer alongside
+the reminder that entries file at 10 digits.
+
+### 2. Low-value shipments: answered, and the answer inverts the assumption
+
+This was §7's "single question most consumers arrive with", and the honest
+answer is the opposite of what almost everyone expects.
+
+CBSA Customs Notice 25-10 is explicit on both halves:
+
+- **Being under the threshold does not help.** "Surtax is applicable on
+  shipments that fall under de minimis thresholds." It applies even to goods
+  eligible for relief under the Postal Imports Remission Order or the Courier
+  Imports Remission Order. A small parcel that owes no duty can still owe the
+  counter-tariff.
+- **Carrying it yourself does help.** "Surtaxes do not apply on goods which
+  qualify for a personal exemption." The traveller's exemption is what matters,
+  not the parcel's value.
+
+So the operative distinction is not cheap versus expensive. It is *shipped to
+you* versus *carried by you within your exemption*. The triage flow now says
+this directly and links the notice. On the U.S. side it notes the separate
+point that the $800 de minimis exception was suspended on 29 August 2025.
+
+Source: https://www.cbsa-asfc.gc.ca/publications/cn-ad/cn25-10-eng.html
+
+### 3. Trade values: built, and off until a key is supplied
+
+**The efficient route is one source for both directions.** StatCan's open data
+service does not publish bilateral trade at tariff-line detail — its open
+tables stop at HS section and chapter, and the tariff-item detail sits behind
+the CIMT application rather than an API. The U.S. Census API publishes both
+directions, so `ingest/fetch-trade-values.mjs` takes imports from Canada and
+exports to Canada from one source, one key, two requests. Year-to-date at
+December is the calendar-year total, so it is two requests and not twenty-four.
+
+The cost is that U.S. exports to Canada are a *mirror* of Canada's imports, not
+StatCan's own figures — valuation, timing and re-exports all differ. That is
+recorded in the output and shown in the UI next to any Canadian figure. It is
+fit for ranking lines by economic weight and not fit for quoting as an official
+Canadian statistic.
+
+**Join levels are deliberately asymmetric.** The U.S. side joins at 8 digits
+because Census import codes are HTS and the Section 338 list is 8-digit HTS —
+a same-country join, exact. The Canadian side joins at 6 because U.S. exports
+are Schedule B, which diverges from Canada's tariff items below 6. Canadian
+figures are labelled "at HS-6" in the interface for that reason, and several
+8-digit lines under one heading correctly show the same number.
+
+**It is not switched on.** The Census API needs a key, it is free and instant,
+and creating accounts is not something I will do on your behalf. Until then
+`src/data/trade-2025.json` ships with `available: false` and the app hides
+trade weight entirely — no zeros, because "not measured" is not "no trade".
+
+```bash
+CENSUS_API_KEY=your-key npm run ingest:trade
+```
+
+The join is covered by 15 tests against a fixture (`npm run check:trade`), and
+`check-data.mjs` refuses to ship a trade file claiming real data without a
+Census source and plausible totals. Both directions run to hundreds of billions,
+so the scraper throws if either total comes in below that.

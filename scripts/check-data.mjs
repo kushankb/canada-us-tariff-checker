@@ -13,6 +13,7 @@ const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), "utf8")
 const ca = read("../src/data/ca-measures.json");
 const us = read("../src/data/us-measures.json");
 const hist = read("../src/data/ca-history.json");
+const trade = read("../src/data/trade-2025.json");
 
 const CODE = /^\d{4}\.\d{2}\.\d{2}$/;
 const errors = [];
@@ -75,6 +76,44 @@ if (!us.exclusionCategories?.length) {
 }
 if (!ca.caveats?.length) {
   errors.push("Finance Canada's caveats are missing. They must stay visible in the UI.");
+}
+
+/* --- trade values ---
+   Trade figures are the easiest thing in this repo to fake convincingly, and
+   a plausible wrong number is worse than none. So a file claiming to hold real
+   data has to look like it came from the API, and a placeholder has to be
+   genuinely empty rather than half-written. */
+if (trade.available) {
+  if (!/census/i.test(trade.source?.name || "")) {
+    errors.push("trade-2025.json says available but names no Census source. Refusing to ship unattributed trade values.");
+  }
+  if (!trade.fetchedAt || Number.isNaN(Date.parse(trade.fetchedAt))) {
+    errors.push("trade-2025.json says available but has no valid fetchedAt timestamp.");
+  }
+  const t = trade.totals || {};
+  if (!(t.usImportsFromCanada > 1e11) || !(t.usExportsToCanada > 1e11)) {
+    errors.push(
+      `trade-2025.json totals are implausible (imports ${t.usImportsFromCanada}, exports ${t.usExportsToCanada}). ` +
+        "Both directions run to hundreds of billions."
+    );
+  }
+  const n8 = Object.keys(trade.usImportsFromCanadaHs8 || {}).length;
+  const n6 = Object.keys(trade.usExportsToCanadaHs6 || {}).length;
+  if (n8 < 1000 || n6 < 1000) {
+    errors.push(`trade-2025.json has only ${n8} 8-digit and ${n6} 6-digit entries; a full year has thousands of each.`);
+  }
+  if (errors.length === 0) {
+    const matched = us.section338.filter((m) => trade.usImportsFromCanadaHs8[m.code] != null).length;
+    console.log(`Trade ${trade.year}: ${n8} 8-digit, ${n6} 6-digit lines · ${matched}/${us.section338.length} Section 338 lines matched`);
+  }
+} else {
+  const leaked =
+    Object.keys(trade.usImportsFromCanadaHs8 || {}).length +
+    Object.keys(trade.usExportsToCanadaHs6 || {}).length;
+  if (leaked) {
+    errors.push(`trade-2025.json is marked unavailable but carries ${leaked} entries. A half-written file must not ship.`);
+  }
+  console.log("Trade values: not ingested (placeholder). The app hides trade weight entirely.");
 }
 
 /* Cross-country joins are only valid at HS-6, so confirm we never claim a

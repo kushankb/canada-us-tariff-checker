@@ -85,19 +85,42 @@ export default function Triage({ onPick }) {
         ← Change who is importing
       </button>
 
-      {kind === "personal" && (
+      {kind === "personal" && dir === "ca" && (
         <div className="note" style={{ "--edge": edge }}>
-          <b>Personal shipments are not always caught.</b> Low-value and casual goods can
-          fall under separate rules, and the courier or customs broker makes the final
-          call. Treat what follows as “is this product category on the list”, not as a
-          bill.
-          {dir === "us" && (
-            <>
-              {" "}
-              The U.S. also ended the $800 duty-free de minimis exception for commercial
-              shipments on 29 August 2025.
-            </>
-          )}
+          <b>Being under the duty-free threshold does not help here.</b> The surtax
+          applies to shipments that fall below the de minimis thresholds, and it applies
+          even to goods that qualify for relief under the Postal Imports Remission Order
+          or the Courier Imports Remission Order. A small parcel that would normally owe
+          no duty can still owe the counter-tariff.
+          <div style={{ marginTop: ".55rem" }}>
+            <b>Carrying it yourself is different.</b> Goods that qualify for a
+            traveller's personal exemption are not surtaxed. The exemption depends on how
+            long you were away, and it is the exemption that matters, not the value of
+            the parcel.
+          </div>
+          <div style={{ marginTop: ".55rem" }}>
+            <a
+              href="https://www.cbsa-asfc.gc.ca/publications/cn-ad/cn25-10-eng.html"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              CBSA Customs Notice 25-10
+            </a>{" "}
+            sets both rules out.
+          </div>
+        </div>
+      )}
+
+      {kind === "personal" && dir === "us" && (
+        <div className="note" style={{ "--edge": edge }}>
+          <b>The $800 duty-free allowance is gone for commercial shipments.</b> The U.S.
+          suspended the de minimis exception on 29 August 2025, so low value on its own no
+          longer keeps a shipment out of duty. Whether Section 338 applies still turns on
+          the tariff line, not the price.
+          <div style={{ marginTop: ".55rem" }}>
+            The courier or customs broker makes the final call on how a personal parcel is
+            entered. Treat what follows as “is this product on the list”, not as a bill.
+          </div>
         </div>
       )}
 

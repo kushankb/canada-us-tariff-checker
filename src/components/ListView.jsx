@@ -3,7 +3,7 @@ import Row from "./Row.jsx";
 import Detail from "./Detail.jsx";
 import EmptyState from "./EmptyState.jsx";
 import { indexItems, search } from "../lib/search.js";
-import { CA_ITEMS, US_ALL, CA, US, fmtDate } from "../lib/data.js";
+import { CA_ITEMS, US_ALL, CA, US, TRADE, fmtDate, tradeWeight } from "../lib/data.js";
 
 const PAGE = 60;
 
@@ -16,6 +16,7 @@ export default function ListView({ side }) {
   const [sectorF, setSectorF] = useState(null);
   const [limit, setLimit] = useState(PAGE);
   const [open, setOpen] = useState(null);
+  const [sort, setSort] = useState("match");
 
   const index = side === "ca" ? CA_INDEX : US_INDEX;
   const items = side === "ca" ? CA_ITEMS : US_ALL;
@@ -26,10 +27,24 @@ export default function ListView({ side }) {
     let r = results;
     if (rateF !== null) r = r.filter((i) => i.rate === rateF);
     if (sectorF) r = r.filter((i) => i.sector === sectorF);
-    return r;
-  }, [results, rateF, sectorF]);
 
-  useEffect(() => setLimit(PAGE), [q, rateF, sectorF]);
+    /* Lines with no trade figure sort last rather than as zero. A missing
+       measurement is not the same as no trade, and ranking them together
+       would quietly bury lines that simply are not matched at this level. */
+    if (sort === "trade" && TRADE.available) {
+      r = [...r].sort((a, b) => {
+        const ta = tradeWeight(a);
+        const tb = tradeWeight(b);
+        if (!ta && !tb) return 0;
+        if (!ta) return 1;
+        if (!tb) return -1;
+        return tb.usd - ta.usd;
+      });
+    }
+    return r;
+  }, [results, rateF, sectorF, sort]);
+
+  useEffect(() => setLimit(PAGE), [q, rateF, sectorF, sort]);
 
   /* Opening a detail from halfway down a long result list otherwise leaves
      the reader looking at the middle of the panel. */
@@ -141,6 +156,26 @@ export default function ListView({ side }) {
           </button>
         ))}
       </div>
+
+      {TRADE.available && (
+        <div className="filters">
+          <span className="lbl">Sort</span>
+          <button
+            className="pill"
+            data-on={sort === "match" ? "1" : "0"}
+            onClick={() => setSort("match")}
+          >
+            Best match
+          </button>
+          <button
+            className="pill"
+            data-on={sort === "trade" ? "1" : "0"}
+            onClick={() => setSort("trade")}
+          >
+            Most traded
+          </button>
+        </div>
+      )}
 
       <div className="resultbar">
         <span>

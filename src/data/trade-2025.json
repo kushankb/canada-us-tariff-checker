@@ -1,0 +1,9 @@
+{
+  "available": false,
+  "year": 2025,
+  "reason": "Not yet ingested. Run: CENSUS_API_KEY=... node ingest/fetch-trade-values.mjs",
+  "note": "Committed as a placeholder so the app builds without trade data. The app hides trade weight entirely when available is false. It never estimates or interpolates a value.",
+  "usImportsFromCanadaHs8": {},
+  "usImportsFromCanadaHs6": {},
+  "usExportsToCanadaHs6": {}
+}

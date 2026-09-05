@@ -9,9 +9,12 @@
 
 import ca from "../data/ca-measures.json";
 import us from "../data/us-measures.json";
+import trade from "../data/trade-2025.json";
+import { tradeWeight as join } from "./trade.js";
 
 export const CA = ca;
 export const US = us;
+export const TRADE = trade;
 
 /* ---------- shaping ---------- */
 
@@ -84,6 +87,14 @@ export function stackedDuty(item) {
   }
   return { kind: "specific", total: `${item.rate}% + ${base}`, base };
 }
+
+/* ---------- trade weight ---------- */
+
+/* The join itself lives in trade.js as pure functions so it can be tested in
+   Node without a bundler. Here it is simply bound to the shipped dataset. */
+export { fmtUSD } from "./trade.js";
+
+export const tradeWeight = (item, dataset = trade) => join(item, dataset);
 
 /* Rate bands. 50% is the top band on both sides, so it gets the strongest
    colour; 15% and 25% step down from it. */

@@ -1,5 +1,14 @@
 import React from "react";
-import { stackedDuty, fmtDate, rateColor, CA, US } from "../lib/data.js";
+import {
+  stackedDuty,
+  fmtDate,
+  rateColor,
+  tradeWeight,
+  fmtUSD,
+  CA,
+  US,
+  TRADE,
+} from "../lib/data.js";
 
 /**
  * The detail view is where the customs jargon is allowed to live. The primary
@@ -8,6 +17,7 @@ import { stackedDuty, fmtDate, rateColor, CA, US } from "../lib/data.js";
  */
 export default function Detail({ item, onBack }) {
   const stack = item.side === "us" ? stackedDuty(item) : null;
+  const trade = tradeWeight(item);
   const edge = item.side === "ca" ? "var(--ca)" : "var(--us)";
 
   return (
@@ -77,6 +87,20 @@ export default function Detail({ item, onBack }) {
             </>
           )}
 
+          {trade && (
+            <>
+              <dt>{TRADE.year} trade</dt>
+              <dd>
+                {fmtUSD(trade.usd)}{" "}
+                <span className="sub">
+                  {trade.exact
+                    ? `${trade.direction}, this exact line`
+                    : `${trade.direction}, HS-6 heading ${trade.hs6} — this line is part of that heading`}
+                </span>
+              </dd>
+            </>
+          )}
+
           {item.qualifier && (
             <>
               <dt>Line qualifier</dt>
@@ -105,6 +129,15 @@ export default function Detail({ item, onBack }) {
             <b>This measure has no published code list here.</b> Coverage is set by the
             proclamation's own scope, so whether a specific line is caught has to be read
             from that proclamation rather than looked up.
+          </div>
+        )}
+
+        {trade && trade.mirror && (
+          <div className="note quiet">
+            <b>That figure is a mirror statistic.</b> It is what the U.S. reports
+            exporting to Canada, not what Statistics Canada reports importing. Valuation,
+            timing and re-exports all differ. It is here to show which lines carry real
+            weight, not to be quoted as an official Canadian import figure.
           </div>
         )}
 

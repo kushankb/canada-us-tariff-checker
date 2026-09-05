@@ -1,8 +1,9 @@
 import React from "react";
-import { stackedDuty, rateColor } from "../lib/data.js";
+import { stackedDuty, rateColor, tradeWeight, fmtUSD } from "../lib/data.js";
 
 export default function Row({ item, onOpen }) {
   const stack = item.side === "us" ? stackedDuty(item) : null;
+  const trade = tradeWeight(item);
 
   return (
     <button className="row" onClick={() => onOpen(item)}>
@@ -20,6 +21,15 @@ export default function Row({ item, onOpen }) {
           ) : null}
           {item.sector}
           {item.scopeLevel ? ` · ${item.authority}` : null}
+          {trade && (
+            <>
+              {" · "}
+              <span title={`${trade.direction}, 2025${trade.exact ? "" : ` (HS-6 heading ${trade.hs6})`}`}>
+                {fmtUSD(trade.usd)}
+                {trade.exact ? "" : " at HS-6"}
+              </span>
+            </>
+          )}
         </span>
         {stack && stack.kind === "percent" && (
           <span className="tag info">{stack.total} with the base duty</span>

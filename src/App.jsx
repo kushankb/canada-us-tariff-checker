@@ -103,7 +103,9 @@ export default function App() {
             Harmonized Tariff Schedule ({US.source.revision})
           </a>
           , and every code is reconciled against the live schedule before publication.
-          Annex codes are 8-digit; entries file at 10 digits.
+          Coverage is screened at 8 digits: a listed 8-digit heading is treated as
+          catching every 10-digit statistical suffix under it. Entries file at 10 digits,
+          so confirm your exact line before entry.
         </p>
         <p>
           Comparisons between the two countries' lists are only valid at 6 digits. National

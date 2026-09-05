@@ -12,8 +12,15 @@ verified and committed as JSON.
 ```bash
 npm install
 npm run dev          # http://localhost:5173
-npm run check        # data integrity, alias coverage, search ranking
+npm run check        # data integrity, alias coverage, search ranking, trade join
 npm run build
+```
+
+Trade values are optional and off by default. To turn them on, get a free
+Census API key (issued instantly at api.census.gov/data/key_signup.html) and:
+
+```bash
+CENSUS_API_KEY=your-key npm run ingest:trade
 ```
 
 ## Coverage
@@ -33,6 +40,7 @@ from "not tariffed *any more*".
 ```
 ingest/scrape-canada.mjs    Finance Canada HTML -> ca-measures.json, ca-history.json
 ingest/scrape-us.mjs        USITC chapter 99 PDF -> us-measures.json
+ingest/fetch-trade-values.mjs  US Census API -> trade-2025.json (optional)
 scripts/check-data.mjs      fails the build on malformed or partial data
 scripts/check-aliases.mjs   reports alias keys that no longer resolve
 scripts/search-smoke.mjs    ranking assertions for real user queries
@@ -58,6 +66,10 @@ placeholder. If it is not in a verified source it is not in the data.
 **Cross-country joins at HS-6 only.** National codes diverge below 6 digits.
 The two lists share 31 identical 8-digit codes but 99 overlapping HS-6
 headings — comparing at 8 undercounts the overlap threefold, silently.
+
+**Screen Section 338 at 8 digits.** A covered 8-digit heading catches every
+10-digit suffix under it. The conservative direction: it may flag a line a
+10-digit reading would exclude, but it will not miss a covered one.
 
 **Fail loud on partial data.** Scrapers throw rather than write short files,
 `npm run check` fails the build, and the UI announces coverage in the header

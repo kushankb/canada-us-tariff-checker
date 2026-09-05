@@ -5,9 +5,10 @@
     "htsApi": "https://hts.usitc.gov/reststop/exportList",
     "revision": "Revision 18 (2026)"
   },
-  "scrapedAt": "2026-09-05T20:48:41.452Z",
+  "scrapedAt": "2026-09-05T21:41:54.681Z",
   "codeLevel": 8,
-  "note": "Section 338 coverage is enacted as U.S. note 51 to subchapter III of chapter 99. Codes are 8-digit HTSUS lines; entries file at 10 digits. A covered 8-digit heading is expected to catch its 10-digit children — confirm against CBP guidance before relying on that. Section 232 and forced-labour measures are scope-level records, not code lists.",
+  "screeningLevel": 8,
+  "note": "Section 338 coverage is enacted as U.S. note 51 to subchapter III of chapter 99. Codes are 8-digit HTSUS lines; entries file at 10 digits. Screening is at 8 digits: a covered 8-digit heading is treated as catching every 10-digit statistical suffix beneath it. This is a deliberate decision, taken 5 September 2026, and it is the conservative direction — it can flag a line that a 10-digit reading might exclude, but it will not miss a covered one. Section 232 and forced-labour measures are scope-level records, not code lists.",
   "entryHeadings": {
     "9903.03.12": {
       "general": "The duty provided in the applicable subheading + 50%",

@@ -34,6 +34,14 @@ jobs:
       - name: Scrape United States
         run: node ingest/scrape-us.mjs
 
+      # Optional. Skipped when no key is configured; the app runs without
+      # trade values and shows none rather than estimating them.
+      - name: Refresh trade values
+        if: env.CENSUS_API_KEY != ''
+        env:
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+        run: node ingest/fetch-trade-values.mjs
+
       # The data gate is what stands between a malformed scrape and a page
       # that states a wrong duty rate with total confidence.
       - name: Verify data
