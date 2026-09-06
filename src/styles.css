@@ -1376,3 +1376,35 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+/* When a search matched some lines under a heading but not others. */
+.subsetnote {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--dim);
+  border-top: 1px solid var(--rule-soft);
+  padding-top: 0.5rem;
+}
+.othersblock {
+  margin-top: 0.9rem;
+  border-top: 1px dashed var(--rule);
+  padding-top: 0.5rem;
+}
+.othershead {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 0.2rem;
+}
+.linecard[data-muted="1"] {
+  background: transparent;
+  box-shadow: none;
+  border-style: dashed;
+}
+.linecard[data-muted="1"] .linedesc,
+.linecard[data-muted="1"] .linecode {
+  color: var(--dim);
+}

@@ -136,15 +136,33 @@ export function shortLabel(item) {
    never merged. Order follows first appearance, which preserves whatever
    ranking the caller has already applied. Scope-level measures have no code
    and are never grouped. */
-export function groupByScheduleText(items) {
+export function groupKey(item) {
+  return item.code
+    ? `${item.code.slice(0, 4)}|${productFamily(item)}`
+    : `scope|${item.id}`;
+}
+
+/* Every line on the list, keyed by heading. Used to tell "this heading has 4
+   lines" apart from "4 of this heading's 34 lines matched your search" — the
+   same row text otherwise means both, and the second one silently hides that
+   you are looking at a subset. */
+export function indexByHeading(items) {
+  const byKey = new Map();
+  for (const item of items) {
+    const k = groupKey(item);
+    if (!byKey.has(k)) byKey.set(k, []);
+    byKey.get(k).push(item);
+  }
+  return byKey;
+}
+
+export function groupByScheduleText(items, allByHeading) {
   const groups = [];
   const byKey = new Map();
 
   for (const item of items) {
     const scheduleText = productFamily(item);
-    const key = item.code
-      ? `${item.code.slice(0, 4)}|${scheduleText}`
-      : `scope|${item.id}`;
+    const key = groupKey(item);
 
     let g = byKey.get(key);
     if (!g) {
@@ -163,6 +181,12 @@ export function groupByScheduleText(items) {
   }
 
   for (const g of groups) {
+    const all = allByHeading?.get(g.key) || g.items;
+    g.all = all;
+    g.totalInHeading = all.length;
+    g.isSubset = all.length > g.items.length;
+    g.others = g.isSubset ? all.filter((i) => !g.items.includes(i)) : [];
+
     const rates = g.items.map((i) => i.rate);
     g.minRate = Math.min(...rates);
     g.maxRate = Math.max(...rates);

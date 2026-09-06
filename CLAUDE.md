@@ -101,6 +101,24 @@ Note the API returns **10-digit statistical lines**; the 8-digit tariff line
 exists only as their prefix. Keying on an exact 8-digit `htsno` finds almost
 nothing.
 
+## What search matches
+
+Search runs per tariff line, over both the detailed line description and the
+schedule heading, with the detailed description weighted higher. That matters
+because the two carry different words: for Canada they come from different
+columns entirely, so "Cheddar", "Mozzarella" and "Within access commitment"
+exist only in the detailed description, while the heading says "Cheese and
+curd".
+
+Grouping runs after filtering, so a group holds only the lines that matched.
+A group that matched part of its heading says so — "4 of 34 lines match" —
+and the panel offers the non-matching lines separately, dimmed. Without that
+count the row reads as though the heading only has four lines.
+
+Changing the query clears the open panel. "4 of 34 lines match" is a claim
+about the current search, so it must not outlive it. Sorting does not change
+membership and is exempt.
+
 ## Search
 
 The alias map in `src/lib/aliases.js` is the product, not the ranking

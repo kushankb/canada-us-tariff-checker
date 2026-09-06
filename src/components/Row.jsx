@@ -29,7 +29,11 @@ export default function Row({ group, selected, onOpen }) {
         <span className="rowdesc">{group.scheduleText}</span>
         <span className="rowmeta">
           <span className="code">
-            {n === 1 ? group.items[0].code : `${n} tariff lines`}
+            {group.isSubset
+              ? `${n} of ${group.totalInHeading} lines match`
+              : n === 1
+                ? group.items[0].code
+                : `${n} tariff lines`}
           </span>
           <span>{group.sector}</span>
           {n > 1 && (

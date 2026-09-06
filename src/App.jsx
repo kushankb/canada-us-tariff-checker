@@ -16,6 +16,7 @@ import {
   fmtDate,
   tradeWeight,
   groupByScheduleText,
+  indexByHeading,
 } from "./lib/data.js";
 
 const PAGE = 60;
@@ -93,14 +94,29 @@ export default function App() {
     return r;
   }, [results, rateF, sectorF, sort]);
 
+  /* Every line on the current list, by heading, so a group can say how much of
+     its heading the search actually matched. */
+  const allByHeading = useMemo(() => indexByHeading(items), [items]);
+
   /* One row per schedule heading. Grouping happens after ranking and
      filtering, so a group appears where its best-ranked line did. */
-  const groups = useMemo(() => groupByScheduleText(filtered), [filtered]);
+  const groups = useMemo(
+    () => groupByScheduleText(filtered, allByHeading),
+    [filtered, allByHeading]
+  );
 
   useEffect(() => {
     setLimit(PAGE);
     centerRef.current?.scrollTo({ top: 0 });
   }, [q, rateF, sectorF, sort, side]);
+
+  /* Drop the open panel when the result set changes membership. A group's
+     "4 of 34 lines match" is a statement about the current query, so leaving
+     it on screen after the query moves on makes it describe a search that is
+     no longer running. Sorting does not change membership, so it is exempt. */
+  useEffect(() => {
+    setSelected(null);
+  }, [q, rateF, sectorF]);
 
   /* Switching direction must drop a selection from the other list. */
   useEffect(() => {

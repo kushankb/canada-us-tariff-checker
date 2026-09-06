@@ -14,13 +14,13 @@ import {
 const FIRST = 12;
 
 /** One tariff line inside a heading. */
-function LineCard({ item }) {
+function LineCard({ item, muted = false }) {
   const stack = item.side === "us" ? stackedDuty(item) : null;
   const trade = tradeWeight(item);
   const colour = rateColor(item.rate);
 
   return (
-    <div className="linecard">
+    <div className="linecard" data-muted={muted ? "1" : "0"}>
       <div className="linehead">
         <span className="linecode">{item.code || item.authority}</span>
         <span className="linerate" style={{ color: colour }}>
@@ -102,7 +102,11 @@ function LineCard({ item }) {
 /** Everything under one schedule heading. */
 export default function DetailPanel({ group, onClose }) {
   const [limit, setLimit] = useState(FIRST);
-  useEffect(() => setLimit(FIRST), [group.key]);
+  const [showOthers, setShowOthers] = useState(false);
+  useEffect(() => {
+    setLimit(FIRST);
+    setShowOthers(false);
+  }, [group.key]);
 
   const n = group.items.length;
   const edge = group.side === "ca" ? "var(--ca)" : "var(--us)";
@@ -113,7 +117,13 @@ export default function DetailPanel({ group, onClose }) {
   return (
     <>
       <div className="panelhead">
-        <h2>{n === 1 ? "Tariff line" : `${n} tariff lines`}</h2>
+        <h2>
+          {group.isSubset
+            ? `${n} of ${group.totalInHeading} lines match`
+            : n === 1
+              ? "Tariff line"
+              : `${n} tariff lines`}
+        </h2>
         <button className="iconbtn detailclose" onClick={onClose}>
           Close
         </button>
@@ -133,6 +143,13 @@ export default function DetailPanel({ group, onClose }) {
           {group.sector}
           {n > 1 && ` · ${group.items[0].code} to ${group.items[n - 1].code}`}
         </p>
+        {group.isSubset && (
+          <p className="subsetnote">
+            Your search matched on the detailed line descriptions, not the heading. The{" "}
+            {group.others.length} other {group.others.length === 1 ? "line" : "lines"} under
+            this heading did not match.
+          </p>
+        )}
       </div>
 
       {shown.map((item) => (
@@ -141,8 +158,24 @@ export default function DetailPanel({ group, onClose }) {
 
       {n > limit && (
         <button className="morebtn" onClick={() => setLimit(n)}>
-          Show the remaining {n - limit} lines under this heading
+          Show the remaining {n - limit} matching lines
         </button>
+      )}
+
+      {group.isSubset && !showOthers && (
+        <button className="morebtn" onClick={() => setShowOthers(true)}>
+          Also show the {group.others.length} non-matching{" "}
+          {group.others.length === 1 ? "line" : "lines"} under this heading
+        </button>
+      )}
+
+      {group.isSubset && showOthers && (
+        <div className="othersblock">
+          <p className="othershead">Rest of this heading — not matched by your search</p>
+          {group.others.map((item) => (
+            <LineCard key={item.code || item.id} item={item} muted />
+          ))}
+        </div>
       )}
 
       {group.side === "us" && anyStack && (
