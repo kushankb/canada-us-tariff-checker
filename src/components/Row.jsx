@@ -1,62 +1,43 @@
 import React from "react";
-import {
-  stackedDuty,
-  rateColor,
-  tradeWeight,
-  fmtUSD,
-  productFamily,
-} from "../lib/data.js";
+import { rateColor } from "../lib/data.js";
 
 /**
- * A result row. Deliberately compact: at 554 lines a row that runs four lines
- * of schedule text turns the list into a wall. The description clamps to two
- * lines and the full text lives in the detail panel.
+ * One schedule heading, not one tariff line. The heading appears once and the
+ * lines under it are counted; the panel lists them individually.
  */
-export default function Row({ item, selected, onOpen }) {
-  const stack = item.side === "us" ? stackedDuty(item) : null;
-  const trade = tradeWeight(item);
-  const colour = rateColor(item.rate);
-  /* The row carries the schedule heading. Several 8-digit lines sit under one
-     heading, so rows will repeat — the code is what separates them, and the
-     detailed description sits in the panel. */
-  const scheduleText = productFamily(item);
+export default function Row({ group, selected, onOpen }) {
+  const colour = rateColor(group.maxRate);
+  const n = group.items.length;
 
   return (
     <button
       className="row"
       data-sel={selected ? "1" : "0"}
       style={{ "--edge": colour, "--edgesoft": "var(--sunken)" }}
-      onClick={() => onOpen(item)}
+      onClick={() => onOpen(group)}
       aria-pressed={selected}
     >
       <span className="ratebadge" style={{ color: colour }}>
-        <b>{item.rate}%</b>
-        {/* Length as well as hue, so the rate is legible without colour. */}
+        <b>{group.rateLabel}</b>
+        {/* Length as well as hue, so the rate reads without colour. */}
         <span className="ratebar" aria-hidden="true">
-          <i style={{ width: `${Math.min(100, item.rate)}%` }} />
+          <i style={{ width: `${Math.min(100, group.maxRate)}%` }} />
         </span>
       </span>
 
       <span className="rowbody">
-        <span className="rowdesc">{scheduleText}</span>
+        <span className="rowdesc">{group.scheduleText}</span>
         <span className="rowmeta">
-          {item.code && <span className="code">{item.code}</span>}
-          <span>{item.sector}</span>
-          {item.scopeLevel && <span>{item.authority}</span>}
-          {trade && (
-            <span title={`${trade.direction}, 2025`}>
-              {fmtUSD(trade.usd)}
-              {trade.exact ? "" : " at HS-6"}
+          <span className="code">
+            {n === 1 ? group.items[0].code : `${n} tariff lines`}
+          </span>
+          <span>{group.sector}</span>
+          {n > 1 && (
+            <span className="codespan">
+              {group.items[0].code} – {group.items[n - 1].code}
             </span>
           )}
-          {stack && stack.kind === "percent" && (
-            <span className="tag info">{stack.total} with duty</span>
-          )}
-          {stack && stack.kind === "specific" && (
-            <span className="tag info">+ {stack.base}</span>
-          )}
-          {item.scopeLevel && <span className="tag warn">No code list</span>}
-          {item.aircraftCarveOut && <span className="tag warn">Aircraft carve-out</span>}
+          {group.scopeLevel && <span className="tag warn">No code list</span>}
         </span>
       </span>
     </button>

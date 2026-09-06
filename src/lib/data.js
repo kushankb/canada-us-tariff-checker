@@ -126,6 +126,56 @@ export function shortLabel(item) {
   return leaf;
 }
 
+/* Several 8-digit lines sit under one schedule heading, and listing each of
+   them repeats that heading verbatim down the page — five rows of "Milk and
+   cream, concentrated..." separated only by their code. Group them instead:
+   the list shows each heading once, and the panel shows every line under it.
+
+   Grouping is keyed on the 4-digit HS heading as well as the text, so two
+   genuinely different headings that happen to share an opening phrase are
+   never merged. Order follows first appearance, which preserves whatever
+   ranking the caller has already applied. Scope-level measures have no code
+   and are never grouped. */
+export function groupByScheduleText(items) {
+  const groups = [];
+  const byKey = new Map();
+
+  for (const item of items) {
+    const scheduleText = productFamily(item);
+    const key = item.code
+      ? `${item.code.slice(0, 4)}|${scheduleText}`
+      : `scope|${item.id}`;
+
+    let g = byKey.get(key);
+    if (!g) {
+      g = {
+        key,
+        scheduleText,
+        sector: item.sector,
+        side: item.side,
+        scopeLevel: !!item.scopeLevel,
+        items: [],
+      };
+      byKey.set(key, g);
+      groups.push(g);
+    }
+    g.items.push(item);
+  }
+
+  for (const g of groups) {
+    const rates = g.items.map((i) => i.rate);
+    g.minRate = Math.min(...rates);
+    g.maxRate = Math.max(...rates);
+    g.rateLabel = g.minRate === g.maxRate ? `${g.maxRate}%` : `${g.minRate}–${g.maxRate}%`;
+    // Sectors can differ inside a heading; name the one that dominates.
+    const bySector = {};
+    g.items.forEach((i) => (bySector[i.sector] = (bySector[i.sector] || 0) + 1));
+    g.sector = Object.entries(bySector).sort((a, b) => b[1] - a[1])[0][0];
+  }
+
+  return groups;
+}
+
 /* Rate bands. 50% is the top band on both sides, so it gets the strongest
    colour; 15% and 25% step down from it. */
 export const rateColor = (r) =>

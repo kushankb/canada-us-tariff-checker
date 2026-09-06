@@ -132,11 +132,18 @@ drawer too.
 Rate is encoded three ways — the number, the bar length, and the hue — so it
 never depends on colour perception alone.
 
-Rows carry the schedule heading only. Several 8-digit lines sit under one
-heading, so rows repeat and the tariff line is what separates them; the
-detailed description sits in the right panel under "Detailed description",
-with the full breadcrumb under "Full schedule text". This repetition is
-intended, not a bug to fix.
+**A row is a schedule heading, not a tariff line.** Listing every 8-digit line
+repeated its heading verbatim down the page — 34 consecutive rows reading
+"Cheese and curd". Rows are grouped by heading and show the line count and code
+span; the panel lists every line under that heading with its own rate, ordinary
+duty and detailed description. Canada's 648 lines become 152 headings, the
+U.S.'s 554 become 203.
+
+Grouping is keyed on the 4-digit HS heading as well as the heading text, so two
+different headings that share an opening phrase are never merged. It runs after
+ranking and filtering, so a group appears where its best-ranked line did. The
+result bar counts both — headings and lines — because the line count is what
+tells you how much coverage a search actually found.
 
 The app opens on a scroll-through walkthrough, not the dashboard, built on real
 lines: Canadian tissue stock into the U.S. at 50% (4803.00.40, plus woodpulp

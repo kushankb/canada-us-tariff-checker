@@ -15,6 +15,7 @@ import {
   freshness,
   fmtDate,
   tradeWeight,
+  groupByScheduleText,
 } from "./lib/data.js";
 
 const PAGE = 60;
@@ -92,6 +93,10 @@ export default function App() {
     return r;
   }, [results, rateF, sectorF, sort]);
 
+  /* One row per schedule heading. Grouping happens after ranking and
+     filtering, so a group appears where its best-ranked line did. */
+  const groups = useMemo(() => groupByScheduleText(filtered), [filtered]);
+
   useEffect(() => {
     setLimit(PAGE);
     centerRef.current?.scrollTo({ top: 0 });
@@ -157,7 +162,7 @@ export default function App() {
   }
 
   const asOf = side === "ca" ? CA.listUpdated : `HTS ${US.source.revision}`;
-  const shown = filtered.slice(0, limit);
+  const shown = groups.slice(0, limit);
 
   return (
     <div className="app">
@@ -280,15 +285,19 @@ export default function App() {
 
           <div className="resultbar">
             <span>
+              {groups.length.toLocaleString()}{" "}
+              {groups.length === 1 ? "heading" : "headings"} ·{" "}
               {filtered.length.toLocaleString()} of {items.length.toLocaleString()}{" "}
               {filtered.length === 1 ? "line" : "lines"}
               {mode === "code" && q.trim() ? " · code lookup" : ""}
               {mode === "fuzzy" ? " · closest guesses" : ""}
             </span>
-            {shown.length > 0 && <span>Showing {shown.length.toLocaleString()}</span>}
+            {shown.length > 0 && groups.length > shown.length && (
+              <span>Showing {shown.length.toLocaleString()}</span>
+            )}
           </div>
 
-          {filtered.length === 0 ? (
+          {groups.length === 0 ? (
             q.trim() ? (
               <EmptyState query={q} side={side} onSearch={setQ} />
             ) : (
@@ -302,19 +311,19 @@ export default function App() {
           ) : (
             <>
               <div className="rows">
-                {shown.map((item) => (
+                {shown.map((group) => (
                   <Row
-                    key={item.code || item.id}
-                    item={item}
-                    selected={selected === item}
+                    key={group.key}
+                    group={group}
+                    selected={selected?.key === group.key}
                     onOpen={setSelected}
                   />
                 ))}
               </div>
-              {filtered.length > limit && (
+              {groups.length > limit && (
                 <button className="morebtn" onClick={() => setLimit((l) => l + PAGE)}>
-                  Show {Math.min(PAGE, filtered.length - limit)} more of{" "}
-                  {(filtered.length - limit).toLocaleString()} remaining
+                  Show {Math.min(PAGE, groups.length - limit)} more of{" "}
+                  {(groups.length - limit).toLocaleString()} remaining headings
                 </button>
               )}
             </>
@@ -327,7 +336,7 @@ export default function App() {
           aria-label={selected ? "Detail" : "Rules"}
         >
           {selected ? (
-            <DetailPanel item={selected} onClose={() => setSelected(null)} />
+            <DetailPanel group={selected} onClose={() => setSelected(null)} />
           ) : (
             <>
               <div className="panelhead">
