@@ -3,3 +3,6 @@ dist/
 dist-artifact/
 .DS_Store
 *.local
+
+# Draft social copy — kept locally, not published
+writing/
