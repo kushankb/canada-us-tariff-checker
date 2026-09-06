@@ -32,14 +32,15 @@ function ToiletRoll() {
   );
 }
 
-function BeerBottle() {
+function SteelCoil() {
   return (
-    <svg viewBox="0 0 120 120" className="storyart" role="img" aria-label="A bottle of beer">
-      <rect x="0" y="0" width="120" height="120" rx="8" fill="var(--us-soft)" />
-      <path d="M52 18h16v14c0 6 10 12 10 22v46a8 8 0 0 1-8 8H50a8 8 0 0 1-8-8V54c0-10 10-16 10-22V18Z" fill="#fff" stroke="var(--us)" strokeWidth="2.5" />
-      <rect x="50" y="14" width="20" height="7" rx="2" fill="var(--us)" />
-      <rect x="44" y="64" width="32" height="26" rx="3" fill="var(--us)" opacity="0.16" stroke="var(--us)" strokeWidth="1.5" />
-      <path d="M50 74h20M50 81h14" stroke="var(--us)" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+    <svg viewBox="0 0 120 120" className="storyart" role="img" aria-label="A coil of rolled steel">
+      <rect x="0" y="0" width="120" height="120" rx="8" fill="#eeecea" />
+      <ellipse cx="46" cy="60" rx="17" ry="30" fill="#fff" stroke="var(--ink)" strokeWidth="2.5" />
+      <path d="M46 30h30a17 30 0 0 1 0 60H46" fill="#fff" stroke="var(--ink)" strokeWidth="2.5" />
+      <ellipse cx="76" cy="60" rx="17" ry="30" fill="#f6f4f2" stroke="var(--ink)" strokeWidth="2.5" />
+      <ellipse cx="76" cy="60" rx="6" ry="11" fill="#e2ddd5" stroke="var(--ink)" strokeWidth="2" />
+      <path d="M22 96h76" stroke="var(--ink)" strokeWidth="2" opacity="0.25" strokeLinecap="round" />
     </svg>
   );
 }
@@ -112,33 +113,47 @@ export default function Story({ onPick }) {
             <ToiletRoll />
           </div>
           <div className="scenetext">
-            <p className="eyebrow" style={{ color: "var(--ca)" }}>
-              01 · Into Canada
+            <p className="eyebrow" style={{ color: "var(--us)" }}>
+              01 · Into the United States
             </p>
-            <h2>American toilet paper now carries a 25% surtax</h2>
+            <h2>The roll is American. What it is made of is not.</h2>
             <p>
-              Tariff line <b>4818.10.00</b> is on Finance Canada's counter-tariff list. It
-              is the line for household toilet paper, and it is one of {CA.count} items in
-              force from {fmtDate(CA.effective)}.
+              Finished toilet paper, tariff line 4818.10, is <b>not</b> on the U.S. list.
+              Most of what Americans buy is milled in America. But the stock it is milled
+              from largely is not.
             </p>
-            <DutyBar base={0} added={25} baseLabel="Ordinary duty: free" addedLabel="Counter-tariff added" />
+            <p style={{ marginTop: "0.6rem" }}>
+              <b>4803.00.40</b> — toilet and facial tissue stock, towel and napkin stock —
+              is named in U.S. note 51. So is <b>4702.00.00</b>, dissolving-grade chemical
+              woodpulp. Both crossed the border free of duty before 22 August 2026. Both
+              now carry 50%.
+            </p>
+            <DutyBar base={0} added={50} baseLabel="Ordinary duty: free" addedLabel="Section 338 added" />
             <div className="worked">
               <div>
-                <span className="lbl">Importer brings in</span>
-                <span>C$10,000 of U.S. toilet paper</span>
+                <span className="lbl">Mill buys Canadian tissue stock</span>
+                <span>US$1,000,000</span>
               </div>
               <div>
-                <span className="lbl">Surtax owed at 25%</span>
-                <span>C$2,500</span>
+                <span className="lbl">Duty owed before 22 Aug 2026</span>
+                <span>US$0</span>
               </div>
               <div>
-                <span className="lbl">Cost to land it</span>
-                <span>C$12,500</span>
+                <span className="lbl">Duty owed now</span>
+                <span>US$500,000</span>
               </div>
             </div>
+            <p className="context">
+              For scale, the Guardian reports the U.S. imported about US$328m of toilet
+              paper from Canada in 2024 on World Bank figures, making Canada by far its
+              largest supplier, and notes that Procter &amp; Gamble, which owns Charmin,
+              said during an earlier round of tariffs that it would have to raise prices.
+              Those figures are reported context, not from the tariff data on this site.
+            </p>
             <p className="caveat">
-              That is charged on the customs value, not the shelf price. Whether it reaches
-              the shelf depends on the retailer's markup and who decides to absorb it.
+              Duty is charged on the customs value of the stock, not on a packet of
+              Charmin. How much reaches a shelf depends on how much of the import bill the
+              mills and retailers absorb.
             </p>
           </div>
         </div>
@@ -147,36 +162,33 @@ export default function Story({ onPick }) {
       <section className="scene">
         <div className="scenegrid reverse">
           <div className="sceneart">
-            <BeerBottle />
+            <SteelCoil />
           </div>
           <div className="scenetext">
-            <p className="eyebrow" style={{ color: "var(--us)" }}>
-              02 · Into the United States
-            </p>
-            <h2>Canadian beer went from free to 50%</h2>
+            <p className="eyebrow">02 · Both directions at once</p>
+            <h2>Steel and aluminum are taxed at 50% each way</h2>
             <p>
-              Tariff line <b>2203.00.00</b>, beer made from malt, is named in U.S. note 51.
-              Its ordinary duty is <b>Free</b> — so before August it crossed the border
-              paying nothing, and now the whole 50% is the charge.
+              This is the one sector where both countries landed on the same number.
+              Canada's list carries <b>272 steel and aluminum lines at 50%</b>, up from
+              25%, and the United States charges 50% on steel, aluminum and their
+              derivatives under Section 232.
             </p>
-            <DutyBar base={0} added={50} baseLabel="Ordinary duty: free" addedLabel="Section 338 added" />
-            <div className="worked">
-              <div>
-                <span className="lbl">Importer brings in</span>
-                <span>US$10,000 of Canadian beer</span>
+            <div className="twoway">
+              <div className="way" style={{ "--edge": "var(--ca)" }}>
+                <span className="waylabel">U.S. steel entering Canada</span>
+                <span className="wayrate">50%</span>
+                <span className="waynote">Counter-tariff, 272 lines from 7206 to 7616</span>
               </div>
-              <div>
-                <span className="lbl">Duty owed before 22 Aug 2026</span>
-                <span>US$0</span>
-              </div>
-              <div>
-                <span className="lbl">Duty owed now</span>
-                <span>US$5,000</span>
+              <div className="way" style={{ "--edge": "var(--us)" }}>
+                <span className="waylabel">Canadian steel entering the U.S.</span>
+                <span className="wayrate">50%</span>
+                <span className="waynote">Section 232, scope-level, no published code list</span>
               </div>
             </div>
             <p className="caveat">
-              A CUSMA certificate does not change this. Section 338 turns on whether the
-              tariff line is listed, not on where the goods originate.
+              Steel is also the clearest example of a carve-out that is not an exemption.
+              U.S. note 51(c) excludes steel, aluminum and copper from Section 338 —
+              because Section 232 already taxes them. Off one list does not mean untaxed.
             </p>
           </div>
         </div>

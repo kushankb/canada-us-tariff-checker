@@ -4,7 +4,6 @@ import {
   rateColor,
   tradeWeight,
   fmtUSD,
-  shortLabel,
   productFamily,
 } from "../lib/data.js";
 
@@ -17,8 +16,10 @@ export default function Row({ item, selected, onOpen }) {
   const stack = item.side === "us" ? stackedDuty(item) : null;
   const trade = tradeWeight(item);
   const colour = rateColor(item.rate);
-  const family = productFamily(item);
-  const qualifier = shortLabel(item);
+  /* The row carries the schedule heading. Several 8-digit lines sit under one
+     heading, so rows will repeat — the code is what separates them, and the
+     detailed description sits in the panel. */
+  const scheduleText = productFamily(item);
 
   return (
     <button
@@ -37,10 +38,7 @@ export default function Row({ item, selected, onOpen }) {
       </span>
 
       <span className="rowbody">
-        <span className="rowdesc">{family}</span>
-        {qualifier && qualifier !== family && (
-          <span className="rowqual">{qualifier}</span>
-        )}
+        <span className="rowdesc">{scheduleText}</span>
         <span className="rowmeta">
           {item.code && <span className="code">{item.code}</span>}
           <span>{item.sector}</span>

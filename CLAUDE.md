@@ -132,17 +132,21 @@ drawer too.
 Rate is encoded three ways — the number, the bar length, and the hue — so it
 never depends on colour perception alone.
 
-Rows show the product family in bold on one line, then the qualifier that
-separates it from its siblings, dimmed, on another. The schedule describes a
-line as a breadcrumb, and running that together made every row a paragraph;
-splitting it means the list scans on family names while the qualifier still
-distinguishes "Within access commitment" from "Over access commitment". The
-full text stays in the detail panel.
+Rows carry the schedule heading only. Several 8-digit lines sit under one
+heading, so rows repeat and the tariff line is what separates them; the
+detailed description sits in the right panel under "Detailed description",
+with the full breadcrumb under "Full schedule text". This repetition is
+intended, not a bug to fix.
 
-The app opens on a scroll-through walkthrough, not the dashboard. Three real
-tariff lines carry it: toilet paper into Canada at 25% (4818.10.00), beer into
-the U.S. at 50% over a free ordinary rate (2203.00.00), and glassware where the
-two stack to 57.2% (7013.99.90). Every figure is named so it can be checked.
+The app opens on a scroll-through walkthrough, not the dashboard, built on real
+lines: Canadian tissue stock into the U.S. at 50% (4803.00.40, plus woodpulp
+4702.00.00), steel and aluminum taxed 50% in both directions, and glassware
+where duties stack to 57.2% (7013.99.90).
+
+The tissue-stock scene is the sharp one and its point is easy to flatten:
+finished toilet paper, 4818.10, is **not** on the U.S. list. The stock American
+mills buy to make it is. Do not rewrite this into "toilet paper is tariffed" —
+the whole story is that the raw material is caught and the finished roll is not.
 
 **Duty is charged on the customs value, not the shelf price.** The walkthrough
 runs its arithmetic on a stated import value and says outright that it does not

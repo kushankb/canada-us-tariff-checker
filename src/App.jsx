@@ -137,6 +137,11 @@ export default function App() {
           <span className="status">
             <span className="hide-sm">Checked {fmtDate(fresh.checkedAt.toISOString())}</span>
           </span>
+          {/* A way out of the walkthrough at any point. Opens Canada's list;
+              the direction switch is the first control in the rail. */}
+          <button className="gotoexplorer" onClick={() => setSide("ca")}>
+            Tariff Explorer <span aria-hidden="true">→</span>
+          </button>
         </header>
         {fresh.stale && (
           <div className="center" style={{ overflow: "visible", paddingTop: "0.6rem" }}>

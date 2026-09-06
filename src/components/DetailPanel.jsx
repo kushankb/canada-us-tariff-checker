@@ -98,7 +98,7 @@ export default function DetailPanel({ item, onClose }) {
               </dd>
             </>
           )}
-          <dt>Description</dt>
+          <dt>Detailed description</dt>
           <dd style={{ fontVariantNumeric: "normal" }}>{item.desc}</dd>
 
           {item.qualifier && (
@@ -109,7 +109,7 @@ export default function DetailPanel({ item, onClose }) {
           )}
           {item.heading && item.heading !== item.desc && (
             <>
-              <dt>Schedule text</dt>
+              <dt>Full schedule text</dt>
               <dd style={{ fontVariantNumeric: "normal" }}>{item.heading}</dd>
             </>
           )}

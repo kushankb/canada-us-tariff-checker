@@ -1234,3 +1234,88 @@ a {
   line-height: 1.4;
   margin-top: 0.2rem;
 }
+
+/* Jump out of the walkthrough into the explorer at any scroll position. */
+.gotoexplorer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0.42rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.gotoexplorer:hover {
+  background: #000;
+}
+.gotoexplorer:focus-visible {
+  outline: 2px solid var(--us);
+  outline-offset: 2px;
+}
+
+/* Reported context from outside the tariff data, marked as such. */
+.context {
+  margin-top: 0.9rem;
+  font-size: 0.83rem !important;
+  line-height: 1.55;
+  color: var(--dim) !important;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+  max-width: 34rem;
+}
+
+/* Two measures, one sector, same number each way. */
+.twoway {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin: 1.2rem 0 0.4rem;
+  max-width: 34rem;
+}
+.way {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--edge);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.85rem;
+}
+.waylabel {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--dim);
+  line-height: 1.35;
+}
+.wayrate {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin: 0.25rem 0 0.15rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--edge);
+}
+.waynote {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--faint);
+  line-height: 1.4;
+}
+
+@media (max-width: 780px) {
+  .twoway {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gotoexplorer {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.76rem;
+  }
+}
