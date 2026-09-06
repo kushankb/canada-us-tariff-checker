@@ -210,16 +210,14 @@ export default function Story({ onPick }) {
           </div>
           <div className="scenetext">
             <p className="eyebrow">02 · Both directions at once</p>
-            <h2>Nobody buys steel. People buy fridges.</h2>
+            <h2>Steel gets hit both ways</h2>
             <p>
-              Steel is the one thing both countries picked the same number for. Canadian
-              steel pays 50% going south, American steel pays 50% coming north. You will
-              never buy a sheet of it — but it is in the washing machine, the tin of
-              beans, the car and the shelving.
+              Both countries picked the same number here. Canadian steel pays 50% going
+              south, American steel pays 50% coming north.
             </p>
             <p>
-              Canada also taxes a lot of those finished things directly, on top of the
-              steel that went into them.
+              Canada also taxes plenty of finished goods made of steel, on top of the
+              steel itself.
             </p>
             <Everyday
               note="On Canada's list, arriving from the US:"
