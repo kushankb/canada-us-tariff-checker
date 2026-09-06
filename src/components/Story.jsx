@@ -95,14 +95,12 @@ export default function Story({ onPick }) {
       <section className="scene hero">
         <p className="eyebrow">Canada–U.S. tariffs · updated {fmtDate(CA.effective)}</p>
         <h1>
-          A 50% tariff. What does that
-          <br />
-          actually cost anyone?
+          Who actually pays for
+          <br />a 50% tariff?
         </h1>
         <p className="lede">
-          Both countries now tax hundreds of ordinary things the other one makes. Here is
-          what that looks like on three real tariff lines, before you go and check your
-          own.
+          Canada and the US are now taxing hundreds of everyday things the other one
+          makes. Here's what that looks like on three real products.
         </p>
         <p className="scrollcue" aria-hidden="true">Scroll ↓</p>
       </section>
@@ -116,17 +114,14 @@ export default function Story({ onPick }) {
             <p className="eyebrow" style={{ color: "var(--us)" }}>
               01 · Into the United States
             </p>
-            <h2>The roll is American. What it is made of is not.</h2>
+            <h2>The roll is American. The pulp comes from Canada.</h2>
             <p>
-              Finished toilet paper, tariff line 4818.10, is <b>not</b> on the U.S. list.
-              Most of what Americans buy is milled in America. But the stock it is milled
-              from largely is not.
+              US mills make the toilet paper, but they buy the stock they make it from
+              across the border. That stock now gets taxed 50% on the way in.
             </p>
-            <p style={{ marginTop: "0.6rem" }}>
-              <b>4803.00.40</b> — toilet and facial tissue stock, towel and napkin stock —
-              is named in U.S. note 51. So is <b>4702.00.00</b>, dissolving-grade chemical
-              woodpulp. Both crossed the border free of duty before 22 August 2026. Both
-              now carry 50%.
+            <p className="ref">
+              On the list: tissue stock (4803.00.40) and woodpulp (4702.00.00). Not on
+              it: the finished rolls (4818.10).
             </p>
             <DutyBar base={0} added={50} baseLabel="Ordinary duty: free" addedLabel="Section 338 added" />
             <div className="worked">
@@ -144,16 +139,15 @@ export default function Story({ onPick }) {
               </div>
             </div>
             <p className="context">
-              For scale, the Guardian reports the U.S. imported about US$328m of toilet
-              paper from Canada in 2024 on World Bank figures, making Canada by far its
-              largest supplier, and notes that Procter &amp; Gamble, which owns Charmin,
-              said during an earlier round of tariffs that it would have to raise prices.
-              Those figures are reported context, not from the tariff data on this site.
+              <span className="contextlabel">Reported elsewhere</span>
+              Canada sells more toilet paper to the US than anywhere else does — about
+              US$328m worth in 2024. Procter &amp; Gamble, which makes Charmin, warned it
+              would have to put prices up during an earlier round of tariffs. Guardian, on
+              World Bank figures.
             </p>
             <p className="caveat">
-              Duty is charged on the customs value of the stock, not on a packet of
-              Charmin. How much reaches a shelf depends on how much of the import bill the
-              mills and retailers absorb.
+              The tax lands on the mill's bill, not your receipt. How much of it reaches
+              the shelf is up to the mills and the shops.
             </p>
           </div>
         </div>
@@ -166,12 +160,10 @@ export default function Story({ onPick }) {
           </div>
           <div className="scenetext">
             <p className="eyebrow">02 · Both directions at once</p>
-            <h2>Steel and aluminum are taxed at 50% each way</h2>
+            <h2>Steel gets hit both ways</h2>
             <p>
-              This is the one sector where both countries landed on the same number.
-              Canada's list carries <b>272 steel and aluminum lines at 50%</b>, up from
-              25%, and the United States charges 50% on steel, aluminum and their
-              derivatives under Section 232.
+              Both countries picked the same number here. Canadian steel pays 50% going
+              south, American steel pays 50% coming north.
             </p>
             <div className="twoway">
               <div className="way" style={{ "--edge": "var(--ca)" }}>
@@ -186,9 +178,8 @@ export default function Story({ onPick }) {
               </div>
             </div>
             <p className="caveat">
-              Steel is also the clearest example of a carve-out that is not an exemption.
-              U.S. note 51(c) excludes steel, aluminum and copper from Section 338 —
-              because Section 232 already taxes them. Off one list does not mean untaxed.
+              Steel is missing from the main US list, which looks like a break. It
+              isn't — a separate rule already taxes it at 50%.
             </p>
           </div>
         </div>
@@ -201,18 +192,18 @@ export default function Story({ onPick }) {
           </div>
           <div className="scenetext">
             <p className="eyebrow">03 · And they stack</p>
-            <h2>Where there was already a duty, the 50% goes on top</h2>
+            <h2>The tariff goes on top of what was already owed</h2>
             <p>
-              Drinking glasses under <b>7013.99.90</b> already carried a 7.2% ordinary
-              duty. The Section 338 charge does not replace it.
+              Drinking glasses from Canada already paid 7.2% to get into the US. The new
+              50% gets added to that, not swapped for it.
             </p>
             <DutyBar base={7.2} added={50} baseLabel="Ordinary duty 7.2%" addedLabel="Section 338 adds 50%" />
             <p className="bignum">
               57.2<span>% total, before other fees</span>
             </p>
+            <p className="ref">Tariff line 7013.99.90.</p>
             <p className="caveat">
-              This is the single most common mistake in reading a tariff list. The rate you
-              look up is added to what the product already owed.
+              This trips people up more than anything else here.
             </p>
           </div>
         </div>
@@ -221,11 +212,10 @@ export default function Story({ onPick }) {
       <section className="scene">
         <div className="scenetext narrow">
           <p className="eyebrow">04 · And plenty is not caught at all</p>
-          <h2>Socks, tomatoes and mattresses are on neither list</h2>
+          <h2>Plenty isn't taxed at all</h2>
           <p>
-            Coverage is decided line by line, not by mood. Both lists here are complete as
-            published, so when a search comes back empty it is an answer rather than a gap
-            — and the checker says which of the two it is.
+            Both lists here are complete. So if your search comes back empty, that's the
+            answer — not a gap in the data. Socks, tomatoes and mattresses are on neither.
           </p>
           <div className="notcaught">
             {["socks", "tomatoes", "mattresses", "sunglasses", "vitamins", "coffee"].map((w) => (
@@ -237,8 +227,8 @@ export default function Story({ onPick }) {
 
       <section className="scene pick" id="pick">
         <div className="scenetext narrow">
-          <h2>Now check your own product</h2>
-          <p>Which way is it moving? That decides which list applies.</p>
+          <h2>Check your own product</h2>
+          <p>Which way is it going?</p>
           <div className="pickers">
             <button className="picker" style={{ "--edge": "var(--ca)" }} onClick={() => onPick("ca")}>
               <b>Coming into Canada from the U.S.</b>

@@ -1408,3 +1408,20 @@ a {
 .linecard[data-muted="1"] .linecode {
   color: var(--dim);
 }
+
+/* Tariff codes belong beside the sentence, not inside it. */
+.ref {
+  margin-top: 0.55rem;
+  font-size: 0.82rem !important;
+  color: var(--faint) !important;
+  font-variant-numeric: tabular-nums;
+}
+.contextlabel {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 0.3rem;
+}
