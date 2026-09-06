@@ -74,7 +74,7 @@ export default function EmptyState({ query, side, onSearch }) {
             they are already caught by {excludedBy.authority}. That is an exclusion from
             one duty, not an exemption from all of them.
           </p>
-          <p style={{ marginTop: "0.6rem" }}>
+          <p>
             Search{" "}
             <button className="linkbtn" onClick={() => onSearch(excludedBy.label.split(",")[0])}>
               {excludedBy.label.split(",")[0].toLowerCase()}
@@ -92,7 +92,7 @@ export default function EmptyState({ query, side, onSearch }) {
             {formerly.hit.desc.length > 70 ? "…" : ""}. It is not on the list in force
             now.
           </p>
-          <p style={{ marginTop: "0.6rem" }}>
+          <p>
             Canada removed counter-tariffs from a large block of goods on 1 September 2025.
             If you are looking at an older entry or an invoice from before that date, the
             rate then is not the rate now.
@@ -106,7 +106,7 @@ export default function EmptyState({ query, side, onSearch }) {
             {side === "ca" ? "Canadian counter-tariff" : "U.S. Section 338"} list. That is
             a real answer, not a gap in the data — this list is complete as published.
           </p>
-          <p style={{ marginTop: "0.6rem" }}>
+          <p>
             It can still owe the ordinary duty for its tariff line, and other measures may
             apply. Check the other side of the border on the tab above.
           </p>
@@ -120,7 +120,7 @@ export default function EmptyState({ query, side, onSearch }) {
             <li>what the thing is made of — “steel shelving”, “plastic tableware”</li>
             <li>the first four digits of an HS code, if you have one</li>
           </ul>
-          <p style={{ marginTop: "0.6rem" }}>
+          <p>
             A word we do not know is a gap in our vocabulary, not proof the product is
             untariffed. Do not read this as a clear result.
           </p>

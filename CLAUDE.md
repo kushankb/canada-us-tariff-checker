@@ -13,8 +13,11 @@ ingest/       Scrapers. Output goes to src/data/. Run manually or via CI.
 scripts/      Verification gates. `npm run check` runs all three.
 src/data/     ca-measures.json, us-measures.json, ca-history.json
               — generated, but committed.
-src/lib/      data.js (shaping, duty stacking, freshness), search.js, aliases.js
-src/          App code.
+src/lib/      data.js (shaping, duty stacking, freshness), search.js, aliases.js,
+              trade.js (pure join, testable without a bundler)
+src/          App.jsx is the shell and owns all filter state. Components are
+              presentational: Sidebar (filters), Row, DetailPanel, ContextPanel,
+              Welcome, EmptyState.
 prototype/    The original single-file prototype. Reference only, partial data.
 ```
 
@@ -102,6 +105,25 @@ algorithm. Two rules learned the hard way:
 Keys that resolve to nothing are kept deliberately. They are what lets the
 empty state say "we understood you, and it is not listed" instead of the much
 weaker "no results".
+
+## Layout of the interface
+
+Three columns: filter rail, results, detail. The rail keeps filters off the
+result column so search stays at the top — two rows of filter pills above the
+results used to push every hit below the fold on a phone.
+
+The right panel shows the selected line's detail, and when nothing is selected
+it shows the rules that reverse the answer. Those rules previously lived in an
+onboarding flow seen once and never again; they belong on screen at the moment
+someone reads a rate. Below 1140px the detail becomes a drawer and a "Rules"
+button in the header opens the same panel. Below 820px the rail becomes a
+drawer too.
+
+Rate is encoded three ways — the number, the bar length, and the hue — so it
+never depends on colour perception alone.
+
+Row descriptions clamp to two lines. The full schedule text runs past 300
+characters and belongs in the detail panel, not in a list of 554.
 
 ## Style
 
