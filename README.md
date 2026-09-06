@@ -1,5 +1,7 @@
 # Canada–U.S. tariff checker
 
+**Live: https://kushankbajaj.com/canada-us-tariff-checker/**
+
 Answers one question in plain language: **is the thing I am buying, shipping or
 receiving subject to a Canada–U.S. tariff, and at what rate?**
 
