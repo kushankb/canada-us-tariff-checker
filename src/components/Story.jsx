@@ -56,6 +56,25 @@ function Tumbler() {
   );
 }
 
+/* Things people actually buy, with the real line and rate behind each. Every
+   entry here is checkable in the explorer. */
+function Everyday({ items, note }) {
+  return (
+    <div className="everyday">
+      {note && <p className="everydaynote">{note}</p>}
+      <ul>
+        {items.map((i) => (
+          <li key={i.code}>
+            <span className="ething">{i.thing}</span>
+            <span className="erate">{i.rate}%</span>
+            <span className="ecode">{i.code}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /* A duty split, drawn to scale: the bar lengths are the numbers. */
 function DutyBar({ base = 0, added, baseLabel, addedLabel }) {
   const total = base + added;
@@ -119,6 +138,10 @@ export default function Story({ onPick }) {
               US mills make the toilet paper, but they buy the stock they make it from
               across the border. That stock now gets taxed 50% on the way in.
             </p>
+            <p>
+              And it is not only toilet roll. That one tariff line covers the stock for
+              facial tissue, paper towel and napkins too. Same stock, same tax.
+            </p>
             <p className="ref">
               On the list: tissue stock (4803.00.40) and woodpulp (4702.00.00). Not on
               it: the finished rolls (4818.10).
@@ -153,10 +176,16 @@ export default function Story({ onPick }) {
             </p>
 
             <p className="caveat">
-              <b>And it rarely comes back down the same way.</b> When input costs rise,
-              shelf prices tend to follow quickly. When they fall again, prices drift down
-              slowly, if at all. Economists call it rockets and feathers. So a tariff that
-              is eventually lifted can leave the price behind it.
+              <b>You will never see this on a receipt.</b> There is no tariff line at the
+              till. There is just a pack of kitchen roll that costs a bit more than it did,
+              for reasons that happened four steps upstream.
+            </p>
+
+            <p className="caveat">
+              <b>And it rarely comes back down.</b> When costs rise, shelf prices follow
+              quickly. When costs fall again, prices drift down slowly, if at all.
+              Economists call it rockets and feathers. A tariff that gets lifted can leave
+              the price behind it.
             </p>
 
             <p className="context">
@@ -181,11 +210,28 @@ export default function Story({ onPick }) {
           </div>
           <div className="scenetext">
             <p className="eyebrow">02 · Both directions at once</p>
-            <h2>Steel gets hit both ways</h2>
+            <h2>Nobody buys steel. People buy fridges.</h2>
             <p>
-              Both countries picked the same number here. Canadian steel pays 50% going
-              south, American steel pays 50% coming north.
+              Steel is the one thing both countries picked the same number for. Canadian
+              steel pays 50% going south, American steel pays 50% coming north. You will
+              never buy a sheet of it — but it is in the washing machine, the tin of
+              beans, the car and the shelving.
             </p>
+            <p>
+              Canada also taxes a lot of those finished things directly, on top of the
+              steel that went into them.
+            </p>
+            <Everyday
+              note="On Canada's list, arriving from the US:"
+              items={[
+                { thing: "Household fridges", rate: 25, code: "8418.21.00" },
+                { thing: "Chest freezers", rate: 25, code: "8418.30.10" },
+                { thing: "Air conditioners", rate: 25, code: "8415.83.00" },
+                { thing: "Dishwasher parts", rate: 25, code: "8422.90.20" },
+                { thing: "Food and drink cans", rate: 50, code: "7310.21.00" },
+              ]}
+            />
+
             <div className="twoway">
               <div className="way" style={{ "--edge": "var(--ca)" }}>
                 <span className="waylabel">U.S. steel entering Canada</span>
@@ -199,8 +245,8 @@ export default function Story({ onPick }) {
               </div>
             </div>
             <p className="caveat">
-              Steel is missing from the main US list, which looks like a break. It
-              isn't — a separate rule already taxes it at 50%.
+              Steel is missing from the main US list, which looks like a break. It isn't —
+              a separate rule already taxes it at 50%.
             </p>
           </div>
         </div>
@@ -224,7 +270,9 @@ export default function Story({ onPick }) {
             </p>
             <p className="ref">Tariff line 7013.99.90.</p>
             <p className="caveat">
-              This trips people up more than anything else here.
+              So the number you look up is never the number that gets paid. Whatever you
+              search for here, the real charge is that rate plus whatever the product
+              already owed — which is why this tool shows you both.
             </p>
           </div>
         </div>
