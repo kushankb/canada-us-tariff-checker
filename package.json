@@ -15,7 +15,8 @@
     "check:data": "node scripts/check-data.mjs",
     "check": "npm run check:data && npm run check:aliases && npm run check:search && npm run check:trade",
     "check:trade": "node scripts/trade-join-test.mjs",
-    "ingest:trade": "node ingest/fetch-trade-values.mjs"
+    "ingest:trade": "node ingest/fetch-trade-values.mjs",
+    "build:artifact": "vite build --config vite.config.artifact.js && node build-artifact.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
