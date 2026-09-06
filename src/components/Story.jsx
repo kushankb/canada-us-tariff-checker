@@ -124,20 +124,41 @@ export default function Story({ onPick }) {
               it: the finished rolls (4818.10).
             </p>
             <DutyBar base={0} added={50} baseLabel="Ordinary duty: free" addedLabel="Section 338 added" />
-            <div className="worked">
-              <div>
-                <span className="lbl">Mill buys Canadian tissue stock</span>
-                <span>US$1,000,000</span>
-              </div>
-              <div>
-                <span className="lbl">Duty owed before 22 Aug 2026</span>
-                <span>US$0</span>
-              </div>
-              <div>
-                <span className="lbl">Duty owed now</span>
-                <span>US$500,000</span>
-              </div>
-            </div>
+
+            <p>
+              A 50% tax on the pulp is not a 50% rise in the price of a roll. What matters
+              is how much of the roll's cost is pulp in the first place.
+            </p>
+
+            <table className="sharetable">
+              <caption>If pulp is this share of what a roll costs to make…</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Pulp's share of cost</th>
+                  <th scope="col">What a 50% tariff adds</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[10, 20, 30, 40].map((share) => (
+                  <tr key={share}>
+                    <td>{share}%</td>
+                    <td>about {share / 2}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="ref">
+              Those shares are illustrative — mill cost breakdowns are not public. The
+              arithmetic is the point: halve the share, and you have the rough cost effect.
+            </p>
+
+            <p className="caveat">
+              <b>And it rarely comes back down the same way.</b> When input costs rise,
+              shelf prices tend to follow quickly. When they fall again, prices drift down
+              slowly, if at all. Economists call it rockets and feathers. So a tariff that
+              is eventually lifted can leave the price behind it.
+            </p>
+
             <p className="context">
               <span className="contextlabel">Reported elsewhere</span>
               Canada sells more toilet paper to the US than anywhere else does — about

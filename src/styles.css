@@ -1425,3 +1425,44 @@ a {
   color: var(--faint);
   margin-bottom: 0.3rem;
 }
+
+/* Cost-share ladder: a tariff on an input is not a tariff on the product. */
+.sharetable {
+  border-collapse: collapse;
+  margin-top: 0.9rem;
+  max-width: 26rem;
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.86rem;
+}
+.sharetable caption {
+  caption-side: top;
+  text-align: left;
+  font-size: 0.76rem;
+  color: var(--dim);
+  padding-bottom: 0.4rem;
+}
+.sharetable th,
+.sharetable td {
+  text-align: left;
+  padding: 0.4rem 0.7rem;
+  border-bottom: 1px solid var(--rule-soft);
+  font-variant-numeric: tabular-nums;
+}
+.sharetable th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.sharetable td:last-child {
+  font-weight: 700;
+}
+.sharetable tbody tr:last-child th,
+.sharetable tbody tr:last-child td {
+  border-bottom: 0;
+}
