@@ -1,5 +1,12 @@
 import React from "react";
-import { stackedDuty, rateColor, tradeWeight, fmtUSD } from "../lib/data.js";
+import {
+  stackedDuty,
+  rateColor,
+  tradeWeight,
+  fmtUSD,
+  shortLabel,
+  productFamily,
+} from "../lib/data.js";
 
 /**
  * A result row. Deliberately compact: at 554 lines a row that runs four lines
@@ -10,6 +17,8 @@ export default function Row({ item, selected, onOpen }) {
   const stack = item.side === "us" ? stackedDuty(item) : null;
   const trade = tradeWeight(item);
   const colour = rateColor(item.rate);
+  const family = productFamily(item);
+  const qualifier = shortLabel(item);
 
   return (
     <button
@@ -28,7 +37,10 @@ export default function Row({ item, selected, onOpen }) {
       </span>
 
       <span className="rowbody">
-        <span className="rowdesc">{item.desc}</span>
+        <span className="rowdesc">{family}</span>
+        {qualifier && qualifier !== family && (
+          <span className="rowqual">{qualifier}</span>
+        )}
         <span className="rowmeta">
           {item.code && <span className="code">{item.code}</span>}
           <span>{item.sector}</span>

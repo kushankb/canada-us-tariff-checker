@@ -37,6 +37,16 @@ Trade-value joins follow the same logic but are not uniformly HS-6, because one 
 
 **Preserve the disclaimers.** Finance Canada's list has no official sanction and its descriptions are illustrative. The app is not customs advice. Both statements stay visible.
 
+## Where the ordinary duty rates come from
+
+`baseDuty` is the general (MFN) rate published for that line in the USITC
+tariff schedule, read from the `general` column of the HTS export and verified
+against the live source. Specific duties expressed per kilogram or per litre
+("3.3¢/kg") are how the schedule itself states those lines — they are not
+approximations and not derived. The UI labels the field "Ordinary duty (MFN
+general rate)" and names the source, because a per-kilogram figure looks
+invented if you have not seen a tariff schedule before.
+
 ## Domain facts that are easy to get wrong
 
 - Canada's counter-tariffs key on **CUSMA marking origin**, not where the parcel shipped from.
@@ -122,8 +132,22 @@ drawer too.
 Rate is encoded three ways — the number, the bar length, and the hue — so it
 never depends on colour perception alone.
 
-Row descriptions clamp to two lines. The full schedule text runs past 300
-characters and belongs in the detail panel, not in a list of 554.
+Rows show the product family in bold on one line, then the qualifier that
+separates it from its siblings, dimmed, on another. The schedule describes a
+line as a breadcrumb, and running that together made every row a paragraph;
+splitting it means the list scans on family names while the qualifier still
+distinguishes "Within access commitment" from "Over access commitment". The
+full text stays in the detail panel.
+
+The app opens on a scroll-through walkthrough, not the dashboard. Three real
+tariff lines carry it: toilet paper into Canada at 25% (4818.10.00), beer into
+the U.S. at 50% over a free ordinary rate (2203.00.00), and glassware where the
+two stack to 57.2% (7013.99.90). Every figure is named so it can be checked.
+
+**Duty is charged on the customs value, not the shelf price.** The walkthrough
+runs its arithmetic on a stated import value and says outright that it does not
+know the retailer's markup or who absorbs the cost. Do not "simplify" this into
+a claim about what a shopper pays.
 
 ## Style
 

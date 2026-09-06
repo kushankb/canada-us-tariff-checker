@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  shortLabel,
+  productFamily,
   stackedDuty,
   fmtDate,
   rateColor,
@@ -36,12 +38,13 @@ export default function DetailPanel({ item, onClose }) {
           </span>
         </div>
 
-        <h3 className="detailtitle">{item.desc}</h3>
+        <h3 className="detailtitle">{productFamily(item)}</h3>
+        <p className="detailqual">{shortLabel(item)}</p>
 
         {stack && stack.kind !== "free" && (
           <div className="stackbox">
             <div>
-              <span className="lbl">Ordinary duty on this line</span>
+              <span className="lbl">Ordinary duty (MFN general rate)</span>
               <span>{stack.base}</span>
             </div>
             <div>
@@ -95,6 +98,9 @@ export default function DetailPanel({ item, onClose }) {
               </dd>
             </>
           )}
+          <dt>Description</dt>
+          <dd style={{ fontVariantNumeric: "normal" }}>{item.desc}</dd>
+
           {item.qualifier && (
             <>
               <dt>Line qualifier</dt>
@@ -176,6 +182,14 @@ export default function DetailPanel({ item, onClose }) {
           )}
           . Descriptions are simplified. This is not customs advice.
         </p>
+        {stack && (
+          <p style={{ marginTop: "0.5rem" }}>
+            The ordinary duty is the general (MFN) rate published for this line in the
+            USITC tariff schedule, read straight from the source above. Rates given per
+            kilogram or per litre are specific duties, which is how the schedule itself
+            expresses them.
+          </p>
+        )}
       </div>
     </>
   );

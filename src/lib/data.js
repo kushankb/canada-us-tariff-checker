@@ -96,6 +96,36 @@ export { fmtUSD } from "./trade.js";
 
 export const tradeWeight = (item, dataset = trade) => join(item, dataset);
 
+/* The first segment of the breadcrumb is the product family — what the thing
+   actually is. Without it a row reads "of a fat content, by weight, not
+   exceeding 1.5 percent", which is unidentifiable; with it the list scans on
+   the bold family name and the dim qualifier separates siblings. */
+export function productFamily(item) {
+  const trail = String(item.heading || item.desc || "");
+  const first = trail.split("—")[0].trim().replace(/[:.]$/, "");
+  return first || String(item.desc || "").trim();
+}
+
+/* The schedule describes a line as a breadcrumb — family, then subdivision,
+   then the qualifier that actually distinguishes it from its siblings. Run
+   together in a list that is a paragraph per row. The last segment is the
+   distinguishing one, so the list shows that and the detail panel carries the
+   whole thing. "Other" and bare qualifiers are useless alone, so those fall
+   back to the fuller text. */
+const WEAK_LEAF = /^(other|others)$/i;
+
+export function shortLabel(item) {
+  const full = String(item.desc || "").trim();
+  const parts = full.split("—").map((x) => x.trim()).filter(Boolean);
+  if (parts.length < 2) return full;
+
+  const leaf = parts[parts.length - 1];
+  if (WEAK_LEAF.test(leaf) || leaf.split(/\s+/).length < 3) {
+    return parts.slice(-2).join(" — ");
+  }
+  return leaf;
+}
+
 /* Rate bands. 50% is the top band on both sides, so it gets the strongest
    colour; 15% and 25% step down from it. */
 export const rateColor = (r) =>

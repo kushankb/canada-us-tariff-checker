@@ -17,15 +17,6 @@ export default function ContextPanel({ side }) {
       {side === "ca" ? (
         <>
           <div className="card accent" style={{ "--edge": edge }}>
-            <h3>Origin, not shipping address</h3>
-            <p>
-              These apply to goods that qualify to be marked as a good of the U.S. under
-              the CUSMA marking regulations. Something made in Vietnam and shipped from a
-              warehouse in Ohio is not a U.S.-origin good.
-            </p>
-          </div>
-
-          <div className="card accent" style={{ "--edge": edge }}>
             <h3>Being under the duty-free threshold does not help</h3>
             <p>
               The surtax applies to shipments below the de minimis thresholds, and to goods

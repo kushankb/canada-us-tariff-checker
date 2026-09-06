@@ -3,7 +3,7 @@ import Sidebar from "./components/Sidebar.jsx";
 import Row from "./components/Row.jsx";
 import DetailPanel from "./components/DetailPanel.jsx";
 import ContextPanel from "./components/ContextPanel.jsx";
-import Welcome from "./components/Welcome.jsx";
+import Story from "./components/Story.jsx";
 import EmptyState from "./components/EmptyState.jsx";
 import { indexItems, search } from "./lib/search.js";
 import {
@@ -138,15 +138,15 @@ export default function App() {
             <span className="hide-sm">Checked {fmtDate(fresh.checkedAt.toISOString())}</span>
           </span>
         </header>
-        <div className="center" style={{ overflowY: "auto" }}>
-          {fresh.stale && (
+        {fresh.stale && (
+          <div className="center" style={{ overflow: "visible", paddingTop: "0.6rem" }}>
             <div className="stalebar">
               <b>This data is {fresh.ageDays} days old.</b> The lists change often. Check
               the official sources before relying on any rate here.
             </div>
-          )}
-          <Welcome onPick={setSide} />
-        </div>
+          </div>
+        )}
+        <Story onPick={setSide} />
       </div>
     );
   }
