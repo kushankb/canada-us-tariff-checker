@@ -5,7 +5,7 @@
     "htsApi": "https://hts.usitc.gov/reststop/exportList",
     "revision": "Revision 18 (2026)"
   },
-  "scrapedAt": "2026-09-10T14:46:10.650Z",
+  "scrapedAt": "2026-09-11T14:49:55.248Z",
   "codeLevel": 8,
   "screeningLevel": 8,
   "note": "Section 338 coverage is enacted as U.S. note 51 to subchapter III of chapter 99. Codes are 8-digit HTSUS lines; entries file at 10 digits. Screening is at 8 digits: a covered 8-digit heading is treated as catching every 10-digit statistical suffix beneath it. This is a deliberate decision, taken 5 September 2026, and it is the conservative direction — it can flag a line that a 10-digit reading might exclude, but it will not miss a covered one. Section 232 and forced-labour measures are scope-level records, not code lists.",
