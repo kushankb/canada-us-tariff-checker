@@ -26,6 +26,9 @@ jobs:
           npm ci --no-audit --no-fund
           cd ingest && npm ci --no-audit --no-fund
 
+      - name: Test scraper section selection
+        run: npm --prefix ingest test
+
       # Both scrapers throw rather than write a short file, so a failure here
       # leaves the previous good data committed and untouched.
       - name: Scrape Canada

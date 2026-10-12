@@ -7,15 +7,15 @@
  * (superseded tranches).
  *
  * PAGE STRUCTURE (verified 2026-09-05)
- * The page is not one table. It is three <details> blocks, each labelled by
- * its <summary>, and the column layout differs between them:
+ * The page is not one table. It has dated <details> blocks, each labelled by
+ * its <summary>. The latest effective date is the current list; earlier dated
+ * blocks are history. The column layout differs between current and history:
  *
- *   "Effective September 8, 2026"                     648 rows, 4 columns
+ *   Current list                                      648 rows, 4 columns
  *       Tariff item | HS heading | Indicative description | Tariff rate
  *       First cell is a <th>, not a <td>. Rate is a bare number ("50").
  *
- *   "Effective September 1, 2025 to September 7, 2026"  313 rows, 6 columns
- *   "Effective up to August 31, 2025"                  1814 rows, 6 columns
+ *   Historical lists                                    6 columns
  *       Tariff item | HS chapter | HS heading | Indicative description
  *       | Effective date | Tariff rate      Rate is "25%". All cells <td>.
  *
@@ -45,7 +45,7 @@ const OUT_CURRENT = resolve(HERE, "../src/data/ca-measures.json");
 const OUT_HISTORY = resolve(HERE, "../src/data/ca-history.json");
 
 const MIN_CURRENT = 600;   // fail loud below this
-const MIN_HISTORY = 2000;  // 313 + 1814 across both superseded tranches
+const MIN_HISTORY = 2000;  // fail loud if a superseded tranche is missing
 
 const TARIFF_ITEM = /^\d{4}\.\d{2}\.\d{2}$/;
 
@@ -116,6 +116,53 @@ function sectionBySummary($, needle) {
   return found;
 }
 
+function effectiveDate(label) {
+  const match = label.match(/\bEffective(?:\s+(?:as of|from))?\s+([A-Z][a-z]+ \d{1,2}, \d{4})\b/i);
+  if (!match) return null;
+  const timestamp = Date.parse(`${match[1]} UTC`);
+  return Number.isNaN(timestamp) ? null : new Date(timestamp).toISOString().slice(0, 10);
+}
+
+function datedSections($) {
+  const sections = [];
+  $("details").each((_, d) => {
+    const el = $(d);
+    const label = clean(el.find("summary").first().text());
+    const from = effectiveDate(label);
+    if (from && el.find("table").length) sections.push({ el, label, from });
+  });
+  return sections;
+}
+
+export function currentSection($, asOf = new Date()) {
+  const today = asOf.toISOString().slice(0, 10);
+  const candidates = datedSections($).filter((section) => section.from <= today);
+  if (!candidates.length) {
+    throw new Error(
+      "No dated <details> section for a tariff list currently in force. " +
+        "Do not fall back to the first table on the page: historical tranches " +
+        "sit alongside the current one."
+    );
+  }
+  candidates.sort((a, b) => b.from.localeCompare(a.from));
+  if (candidates.length > 1 && candidates[0].from === candidates[1].from) {
+    throw new Error(`Multiple tariff sections are effective on ${candidates[0].from}.`);
+  }
+  return candidates[0];
+}
+
+export function historicalSections($, current) {
+  const sections = datedSections($)
+    .filter((section) => section.from < current.from)
+    .sort((a, b) => a.from.localeCompare(b.from));
+  return sections.map((section, i) => {
+    const next = i + 1 < sections.length ? sections[i + 1] : current;
+    const end = new Date(`${next.from}T00:00:00Z`);
+    end.setUTCDate(end.getUTCDate() - 1);
+    return { ...section, to: end.toISOString().slice(0, 10) };
+  });
+}
+
 /* Map header labels -> column index, so a reordered or added column does not
    shift everything by one. */
 function headerIndex($, table) {
@@ -179,18 +226,9 @@ async function main() {
   const $ = cheerio.load(html);
 
   /* ---- the list in force ---- */
-  const cur = sectionBySummary($, "Effective September 8, 2026");
-  if (!cur) {
-    throw new Error(
-      'No <details> section whose summary contains "Effective September 8, 2026". ' +
-        "Either a new tranche has been published under a different date, or the " +
-        "page structure changed. Do not fall back to the first table on the page: " +
-        "the historical tranches sit alongside the current one and would be " +
-        "published as if they were in force."
-    );
-  }
+  const cur = currentSection($);
   const curTable = cur.el.find("table").first();
-  const measures = parseTable($, curTable, { defaultEffective: "2026-09-08" });
+  const measures = parseTable($, curTable, { defaultEffective: cur.from });
 
   if (measures.length < MIN_CURRENT) {
     throw new Error(
@@ -200,20 +238,32 @@ async function main() {
   }
 
   /* ---- superseded tranches, kept so the app can answer "it used to be" ---- */
-  const HIST = [
-    { needle: "Effective September 1, 2025", id: "2025-09-01", from: "2025-09-01", to: "2026-09-07" },
-    { needle: "Effective up to August 31, 2025", id: "pre-2025-09", from: "2025-03-04", to: "2025-08-31" },
-  ];
-  const tranches = [];
-  for (const h of HIST) {
-    const sec = sectionBySummary($, h.needle);
-    if (!sec) {
-      console.warn(`Warning: historical section "${h.needle}" not found; skipping.`);
-      continue;
-    }
-    const rows = parseTable($, sec.el.find("table").first(), { defaultEffective: h.from });
-    tranches.push({ id: h.id, label: sec.label, from: h.from, to: h.to, count: rows.length, measures: rows });
+  const tranches = historicalSections($, cur).map((section) => {
+    const rows = parseTable($, section.el.find("table").first(), { defaultEffective: section.from });
+    return {
+      id: section.from,
+      label: section.label,
+      from: section.from,
+      to: section.to,
+      count: rows.length,
+      measures: rows,
+    };
+  });
+  const preSeptember = sectionBySummary($, "Effective up to August 31, 2025");
+  if (preSeptember) {
+    const rows = parseTable($, preSeptember.el.find("table").first(), { defaultEffective: "2025-03-04" });
+    tranches.push({
+      id: "pre-2025-09",
+      label: preSeptember.label,
+      from: "2025-03-04",
+      to: "2025-08-31",
+      count: rows.length,
+      measures: rows,
+    });
+  } else {
+    console.warn('Warning: historical section "Effective up to August 31, 2025" not found; skipping.');
   }
+  tranches.sort((a, b) => b.from.localeCompare(a.from));
 
   const histTotal = tranches.reduce((n, t) => n + t.count, 0);
   if (histTotal < MIN_HISTORY) {
@@ -232,7 +282,7 @@ async function main() {
     source: SRC,
     scrapedAt: new Date().toISOString(),
     listUpdated,
-    effective: "2026-09-08",
+    effective: cur.from,
     label: cur.label,
     codeLevel: 8,
     count: measures.length,
@@ -288,7 +338,9 @@ async function main() {
   for (const t of tranches) console.log(`History: ${t.count} rows — ${t.label}`);
 }
 
-main().catch((e) => {
-  console.error(e.message);
-  process.exit(1);
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    console.error(e.message);
+    process.exit(1);
+  });
+}

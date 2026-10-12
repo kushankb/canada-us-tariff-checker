@@ -5,7 +5,8 @@
   "description": "Scrapers that generate ../src/data/*.json. Run manually or from CI.",
   "scripts": {
     "canada": "node scrape-canada.mjs",
-    "us": "node scrape-us.mjs"
+    "us": "node scrape-us.mjs",
+    "test": "node test-scrape-canada.mjs"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
